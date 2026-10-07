@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>לוח בקרה — בורקס טורקי אסלי</title>
+<title>לוח בקרה — בורקס עמקה</title>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@600;700;800&family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -91,7 +91,7 @@
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
     <div class="flame">🔥</div>
-    <h1>לוח בקרה — בורקס טורקי אסלי</h1>
+    <h1>לוח בקרה — בורקס עמקה</h1>
     <p>הזן את סיסמת הניהול כדי לצפות בהזמנות</p>
     <input type="password" id="pwInput" placeholder="••••••" autocomplete="off">
     <button onclick="login()">כניסה</button>
@@ -219,8 +219,8 @@ function renderOrders(){
       <div class="order-items">${itemsHtml}</div>
       <div class="order-cust">
         👤 ${o.customer.name} · 📞 ${o.customer.phone}<br>
-        📍 ${o.customer.address}<br>
-        🕒 ${o.customer.slot}
+        📍 ${o.customer.address}
+        ${o.customer.slot ? '<br>🕒 ' + o.customer.slot : ''}
         ${o.customer.notes ? '<br>📝 ' + o.customer.notes : ''}
       </div>
       <div class="order-total">סה״כ: ${o.total} ₪</div>
