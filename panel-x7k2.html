@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>לוח בקרה — בורקס טורקי אסלי</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@600;700;800&family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --coffee:#2E1B12; --coffee-2:#3D2317; --crust:#E8A33D; --crust-light:#F4C468;
+    --terracotta:#C9532B; --cream:#FBF3E7; --cream-2:#F3E6D2; --ink:#2A1A10; --line:rgba(46,27,18,0.12);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Heebo',sans-serif; background:var(--cream); color:var(--ink); min-height:100vh;}
+  h1,h2,.display{font-family:'Rubik',sans-serif;}
+
+  .login-screen{
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;
+    background:linear-gradient(180deg,var(--coffee-2),var(--coffee) 70%);
+  }
+  .login-box{
+    background:#fff; border-radius:20px; padding:30px 26px; width:100%; max-width:340px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.3); text-align:center;
+  }
+  .login-box .flame{font-size:34px; margin-bottom:8px;}
+  .login-box h1{font-size:19px; color:var(--coffee-2); margin-bottom:4px;}
+  .login-box p{font-size:12.5px; color:#8a7461; margin-bottom:20px;}
+  .login-box input{
+    width:100%; padding:13px; border-radius:12px; border:1.5px solid var(--line);
+    font-size:16px; text-align:center; letter-spacing:2px; margin-bottom:12px; font-family:inherit;
+  }
+  .login-box button{
+    width:100%; padding:13px; border-radius:12px; border:none; cursor:pointer;
+    background:linear-gradient(135deg,var(--crust),var(--terracotta)); color:#fff;
+    font-weight:800; font-size:14.5px;
+  }
+  .login-error{color:var(--terracotta); font-size:12.5px; margin-top:10px; min-height:16px;}
+
+  header.admin{
+    background:var(--coffee); color:var(--cream); padding:16px 18px;
+    display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10;
+  }
+  header.admin .title{font-weight:800; font-size:16px; display:flex; align-items:center; gap:8px;}
+  header.admin button{
+    background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:var(--cream);
+    padding:7px 12px; border-radius:10px; font-size:12px; cursor:pointer;
+  }
+
+  main{padding:16px; max-width:640px; margin:0 auto;}
+  .toolbar{display:flex; gap:8px; margin-bottom:14px; overflow-x:auto;}
+  .filter-chip{
+    white-space:nowrap; padding:7px 14px; border-radius:999px; font-size:12.5px; font-weight:600;
+    border:1.5px solid var(--line); background:#fff; cursor:pointer; color:var(--ink);
+  }
+  .filter-chip.active{background:var(--coffee); color:#fff; border-color:var(--coffee);}
+
+  .empty{text-align:center; padding:60px 20px; color:#8a7461; font-size:13.5px;}
+
+  .order-card{
+    background:#fff; border-radius:16px; padding:16px; margin-bottom:12px; border:1px solid var(--line);
+    box-shadow:0 4px 14px rgba(46,27,18,0.06);
+  }
+  .order-top{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;}
+  .order-num{font-weight:800; color:var(--terracotta); font-size:14.5px;}
+  .order-time{font-size:11.5px; color:#8a7461; margin-top:2px;}
+  .status-badge{
+    font-size:11px; font-weight:700; padding:5px 10px; border-radius:999px; white-space:nowrap;
+  }
+  .status-חדשה{background:#FEE2C4; color:#8a5a12;}
+  .status-בטיפול{background:#DCEAFB; color:#1c5b9e;}
+  .status-נשלחה{background:#E1EFDA; color:#3c6b2f;}
+  .status-הושלמה{background:#E7E1F5; color:#5a3fa0;}
+
+  .order-items{font-size:13px; color:#4a382c; line-height:1.8; margin-bottom:10px;}
+  .order-cust{
+    font-size:12.5px; color:#6b5644; background:var(--cream); border-radius:10px; padding:10px 12px;
+    line-height:1.8; margin-bottom:12px;
+  }
+  .order-total{font-weight:800; color:var(--coffee-2); font-size:14px; margin-bottom:12px;}
+  .status-select{
+    width:100%; padding:9px; border-radius:10px; border:1.5px solid var(--line);
+    font-family:inherit; font-size:13px; background:#fff;
+  }
+
+  .refresh-note{text-align:center; font-size:11.5px; color:#8a7461; margin-top:14px;}
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="flame">🔥</div>
+    <h1>לוח בקרה — בורקס טורקי אסלי</h1>
+    <p>הזן את סיסמת הניהול כדי לצפות בהזמנות</p>
+    <input type="password" id="pwInput" placeholder="••••••" autocomplete="off">
+    <button onclick="login()">כניסה</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<div id="dashboard" style="display:none;">
+  <header class="admin">
+    <div class="title">🔥 הזמנות נכנסות</div>
+    <button onclick="logout()">יציאה</button>
+  </header>
+  <main>
+    <div class="toolbar" id="toolbar"></div>
+    <div id="ordersList"></div>
+    <div class="refresh-note">מתעדכן אוטומטית כל 30 שניות · <a href="#" onclick="loadOrders(); return false;" style="color:var(--terracotta); font-weight:700;">רענן עכשיו</a></div>
+  </main>
+</div>
+
+<script>
+// ===== עדכן כאן לכתובת ה-Worker שלך אחרי הפריסה ל-Cloudflare =====
+const API_URL = 'https://borekas-backend.eliran67.workers.dev';
+
+const STATUSES = ['חדשה','בטיפול','נשלחה','הושלמה'];
+let currentFilter = 'הכל';
+let allOrders = [];
+let pollTimer = null;
+
+function getToken(){ return localStorage.getItem('borekas_admin_token'); }
+function setToken(t){ localStorage.setItem('borekas_admin_token', t); }
+function clearToken(){ localStorage.removeItem('borekas_admin_token'); }
+
+async function login(){
+  const pw = document.getElementById('pwInput').value;
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  if(!pw){ errEl.textContent = 'הזן סיסמה'; return; }
+
+  try{
+    const res = await fetch(API_URL + '/api/admin/login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ password: pw })
+    });
+    const data = await res.json();
+    if(!res.ok){ errEl.textContent = data.error || 'שגיאה בהתחברות'; return; }
+    setToken(data.token);
+    showDashboard();
+  } catch(e){
+    errEl.textContent = 'שגיאת רשת — בדוק שכתובת ה-API הוגדרה נכון';
+  }
+}
+
+function logout(){
+  clearToken();
+  if(pollTimer) clearInterval(pollTimer);
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+}
+
+function showDashboard(){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  renderToolbar();
+  loadOrders();
+  pollTimer = setInterval(loadOrders, 30000);
+}
+
+function renderToolbar(){
+  const bar = document.getElementById('toolbar');
+  const filters = ['הכל', ...STATUSES];
+  bar.innerHTML = filters.map(f =>
+    `<button class="filter-chip ${f===currentFilter?'active':''}" onclick="setFilter('${f}')">${f}</button>`
+  ).join('');
+}
+
+function setFilter(f){
+  currentFilter = f;
+  renderToolbar();
+  renderOrders();
+}
+
+async function loadOrders(){
+  const token = getToken();
+  if(!token){ logout(); return; }
+
+  try{
+    const res = await fetch(API_URL + '/api/admin/orders', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if(res.status === 401){ logout(); return; }
+    const data = await res.json();
+    allOrders = data.orders || [];
+    renderOrders();
+  } catch(e){
+    // שקט - ננסה שוב בפעם הבאה
+  }
+}
+
+function renderOrders(){
+  const list = document.getElementById('ordersList');
+  const filtered = currentFilter === 'הכל' ? allOrders : allOrders.filter(o => o.status === currentFilter);
+
+  if(filtered.length === 0){
+    list.innerHTML = '<div class="empty">אין הזמנות להצגה כרגע</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(o => {
+    const time = new Date(o.createdAt).toLocaleString('he-IL', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'});
+    const itemsHtml = o.items.map(it => {
+      let l = `${it.name} × ${it.qty} — ${it.qty * it.price} ₪`;
+      if(it.sauces && it.sauces.length) l += ` (${it.sauces.join(', ')})`;
+      return l;
+    }).join('<br>');
+
+    return `
+    <div class="order-card">
+      <div class="order-top">
+        <div>
+          <div class="order-num">#${o.orderNum}</div>
+          <div class="order-time">${time}</div>
+        </div>
+        <div class="status-badge status-${o.status}">${o.status}</div>
+      </div>
+      <div class="order-items">${itemsHtml}</div>
+      <div class="order-cust">
+        👤 ${o.customer.name} · 📞 ${o.customer.phone}<br>
+        📍 ${o.customer.address}<br>
+        🕒 ${o.customer.slot}
+        ${o.customer.notes ? '<br>📝 ' + o.customer.notes : ''}
+      </div>
+      <div class="order-total">סה״כ: ${o.total} ₪</div>
+      <select class="status-select" onchange="updateStatus('${o.id}', this.value)">
+        ${STATUSES.map(s => `<option value="${s}" ${s===o.status?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>`;
+  }).join('');
+}
+
+async function updateStatus(id, status){
+  const token = getToken();
+  try{
+    await fetch(API_URL + '/api/admin/orders/' + id, {
+      method:'PATCH',
+      headers:{'Content-Type':'application/json', 'Authorization':'Bearer ' + token},
+      body: JSON.stringify({ status })
+    });
+    loadOrders();
+  } catch(e){
+    alert('עדכון הסטטוס נכשל, נסה שוב');
+  }
+}
+
+// אם יש טוקן שמור ותקף, כניסה ישירה
+if(getToken()){ showDashboard(); }
+</script>
+
+</body>
+</html>
