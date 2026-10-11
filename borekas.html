@@ -15,7 +15,7 @@
 <meta property="og:locale" content="he_IL">
 <meta property="og:site_name" content="בורקס עמקה">
 <meta property="og:title" content="בורקס עמקה | בורקס חם וטרי בעמקה">
-<meta property="og:description" content="בורקס חם וטרי, 25 ₪ לכל הטעמים. ביצה וטרופית בתוספת, או קומבו ב-30 ₪. הזמנות עד 21:00.">
+<meta property="og:description" content="בורקס חם וטרי, 25 ₪ לכל הטעמים. ביצה וטרופית בתוספת, או מבצע ב-30 ₪. הזמנות עד 21:00.">
 <meta property="og:url" content="https://eliran67.github.io/borekas.html">
 <meta property="og:image" content="https://eliran67.github.io/images/burekas-cheese.jpg">
 <meta property="og:image:width" content="600">
@@ -66,7 +66,7 @@
         "hasMenuItem": [
           {"@type":"MenuItem","name":"ביצה","offers":{"@type":"Offer","price":"3","priceCurrency":"ILS"}},
           {"@type":"MenuItem","name":"טרופית","offers":{"@type":"Offer","price":"3","priceCurrency":"ILS"}},
-          {"@type":"MenuItem","name":"קומבו בורקס + ביצה + טרופית","offers":{"@type":"Offer","price":"30","priceCurrency":"ILS"}}
+          {"@type":"MenuItem","name":"מבצע בורקס + ביצה + טרופית","offers":{"@type":"Offer","price":"30","priceCurrency":"ILS"}}
         ]
       }
     ]
@@ -697,7 +697,7 @@
     </details>
     <details>
       <summary>כמה עולה בורקס?</summary>
-      <p>כל בורקס עולה 25 ₪. תוספת ביצה או טרופית עולה 3 ₪, ומבצע קומבו של בורקס עם ביצה וטרופית עולה 30 ₪.</p>
+      <p>כל בורקס עולה 25 ₪. תוספת ביצה או טרופית עולה 3 ₪, ומבצע של בורקס עם ביצה וטרופית עולה 30 ₪.</p>
     </details>
     <details>
       <summary>אילו סוגי בורקס יש?</summary>
@@ -893,7 +893,7 @@
     {"@type":"Question","name":"איפה נמצא בורקס עמקה?","acceptedAnswer":{"@type":"Answer","text":"ברחוב הכרם 48 ביישוב עמקה. אפשר לנווט אלינו ישירות ב-Waze."}},
     {"@type":"Question","name":"מה שעות הפעילות?","acceptedAnswer":{"@type":"Answer","text":"אנחנו פתוחים בימים א׳-ה׳ בין 09:00 ל-21:00. כדאי להזמין לפחות שעה מראש."}},
     {"@type":"Question","name":"איך מזמינים בורקס?","acceptedAnswer":{"@type":"Answer","text":"בונים את המגש באתר ושולחים את ההזמנה בוואטסאפ, או מתקשרים ל-054-9073509."}},
-    {"@type":"Question","name":"כמה עולה בורקס?","acceptedAnswer":{"@type":"Answer","text":"כל בורקס עולה 25 ₪. תוספת ביצה או טרופית עולה 3 ₪, ומבצע קומבו של בורקס עם ביצה וטרופית עולה 30 ₪."}},
+    {"@type":"Question","name":"כמה עולה בורקס?","acceptedAnswer":{"@type":"Answer","text":"כל בורקס עולה 25 ₪. תוספת ביצה או טרופית עולה 3 ₪, ומבצע של בורקס עם ביצה וטרופית עולה 30 ₪."}},
     {"@type":"Question","name":"אילו סוגי בורקס יש?","acceptedAnswer":{"@type":"Answer","text":"גבינה עשירה, תרד וגבינות קלאסי, תפוח אדמה נימוח ופטריות ותפו״א - כולם בבצק עלים פריך שנאפה במקום."}},
     {"@type":"Question","name":"האם הבורקס כשר?","acceptedAnswer":{"@type":"Answer","text":"כן, הבורקסים בכשרות בד״ץ בית יוסף."}},
     {"@type":"Question","name":"איך משלמים?","acceptedAnswer":{"@type":"Answer","text":"אפשר לשלם בביט, בפייבוקס או במזומן."}}
@@ -1055,7 +1055,7 @@ function scrollToId(id){
       });
       if(comboCount > 0){
         var comboLi = document.createElement('li');
-        comboLi.innerHTML = '<span>מבצע קומבו (בורקס+ביצה+טרופית) × ' + comboCount + '</span><span>-' + discount + ' ₪</span>';
+        comboLi.innerHTML = '<span>מבצע (בורקס+ביצה+טרופית) × ' + comboCount + '</span><span>-' + discount + ' ₪</span>';
         linesEl.appendChild(comboLi);
       }
     }
@@ -1157,7 +1157,7 @@ function scrollToId(id){
       msgLines.push('• ' + line.qty + ' × ' + line.label);
     });
     if(result.comboCount > 0){
-      msgLines.push('• כולל מבצע קומבו בורקס+ביצה+טרופית × ' + result.comboCount);
+      msgLines.push('• כולל מבצע בורקס+ביצה+טרופית × ' + result.comboCount);
     }
     if(customerNotes){
       msgLines.push('הערות: ' + customerNotes);
