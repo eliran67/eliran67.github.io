@@ -370,10 +370,7 @@
     border-radius:999px; padding:9px 14px; font-size:12.5px; font-weight:600;
     transition:background .15s ease, transform .15s ease;
   }
-  .quick-btn:hover{background:rgba(58,36,20,0.1); transform:translateY(-1px);}
-  .quick-btn-bit{background:#2bd9c3; border-color:#1fb8a5; color:#08332e; font-weight:800;}
-  .quick-btn-bit:hover{background:#25c7b2;}
-  .copy-toast{
+  .quick-btn:hover{background:rgba(58,36,20,0.1); transform:translateY(-1px);}  .copy-toast{
     display:block; min-height:18px; margin-top:8px; text-align:center;
     font-size:12.5px; font-weight:700; color:var(--ob-gold-deep);
     opacity:0; transition:opacity .2s ease;
@@ -667,9 +664,6 @@
     </button>
 
     <div class="ob-quick-actions">
-      <a id="pay-bit" class="quick-btn quick-btn-bit" href="https://apps.apple.com/il/app/bit/id1182007739" target="_blank" rel="noopener">
-        <span aria-hidden="true">💸</span> תשלום בביט
-      </a>
       <button type="button" class="quick-btn" data-copy="0549073509" data-label="תשלום">
         <span aria-hidden="true">💳</span> העתקת מספר לביט / פייבוקס
       </button>
@@ -1258,32 +1252,6 @@ function scrollToId(id){
       );
     });
   });
-
-  // כפתור "תשלום בביט": ביט לא מאפשרת קישור עם סכום ממולא לחשבון פרטי,
-  // אז מעתיקים את המספר, מציגים את הסכום, ופותחים את האפליקציה (באנדרואיד) או את הדף שלה ב-App Store (באייפון)
-  var BIT_PHONE = '0549073509';
-  // פותח את המסך הראשי של ביט (כמו לחיצה על האייקון); אם ביט לא מותקנת - עובר לדף שלה בחנות
-  var BIT_ANDROID = 'intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;' +
-    'package=com.bnhp.payments.paymentsapp;S.browser_fallback_url=' +
-    encodeURIComponent('https://play.google.com/store/apps/details?id=com.bnhp.payments.paymentsapp') + ';end';
-  var bitBtn = document.getElementById('pay-bit');
-  if(bitBtn){
-    bitBtn.addEventListener('click', function(e){
-      e.preventDefault();
-      var totalText = (document.getElementById('ob-total') || {}).textContent || '';
-      var hasTotal = totalText && totalText.trim() !== '0 ₪';
-      var msg = 'המספר ' + BIT_PHONE + ' הועתק' + (hasTotal ? ' · לתשלום: ' + totalText.trim() : '') + ' - פותחים את ביט...';
-      copyText(BIT_PHONE).catch(function(){});
-      showToast(msg);
-      if(/android/i.test(navigator.userAgent)){
-        // השהייה קצרה כדי שהלקוח יספיק לראות את הסכום (עדיין בתוך חלון הלחיצה של הדפדפן)
-        setTimeout(function(){ window.location.href = BIT_ANDROID; }, 1200);
-      } else {
-        // באייפון/מחשב פותחים מיד, אחרת הדפדפן חוסם את החלון החדש
-        window.open(bitBtn.href, '_blank', 'noopener');
-      }
-    });
-  }
 })();
 </script>
 
