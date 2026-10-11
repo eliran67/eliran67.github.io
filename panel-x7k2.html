@@ -248,7 +248,7 @@ function renderOrders(){
   list.innerHTML = filtered.map(o => {
     const time = new Date(o.createdAt).toLocaleString('he-IL', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'});
     let itemsHtml = o.items.map(it => `${esc(it.name)} × ${it.qty} — ${it.qty * it.price} ₪`).join('<br>');
-    if(o.comboCount > 0) itemsHtml += `<br>מבצע קומבו × ${o.comboCount} — -${o.discount} ₪`;
+    if(o.comboCount > 0) itemsHtml += `<br>מבצע × ${o.comboCount} — -${o.discount} ₪`;
     const phoneDigits = String(o.customer.phone || '').replace(/[^\d+]/g, '');
 
     return `
