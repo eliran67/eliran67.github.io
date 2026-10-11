@@ -69,8 +69,17 @@
   }
   .status-חדשה{background:#FEE2C4; color:#8a5a12;}
   .status-בטיפול{background:#DCEAFB; color:#1c5b9e;}
-  .status-נשלחה{background:#E1EFDA; color:#3c6b2f;}
+  .status-מוכנה{background:#E1EFDA; color:#3c6b2f;}
   .status-הושלמה{background:#E7E1F5; color:#5a3fa0;}
+  .status-בוטלה{background:#EEE; color:#666;}
+
+  .email-alert{
+    background:#FDECEA; color:#8c1d18; border:1px solid #f3b8b3; border-radius:12px;
+    padding:10px 12px; font-size:12.5px; line-height:1.6; margin-bottom:14px;
+  }
+  .email-alert:empty{display:none;}
+  .email-alert code{direction:ltr; unicode-bidi:embed; font-size:11.5px; word-break:break-word;}
+  .order-cust a{color:var(--terracotta); font-weight:700;}
 
   .order-items{font-size:13px; color:#4a382c; line-height:1.8; margin-bottom:10px;}
   .order-cust{
@@ -105,6 +114,7 @@
     <button onclick="logout()">יציאה</button>
   </header>
   <main>
+    <div class="email-alert" id="emailAlert" role="alert"></div>
     <div class="toolbar" id="toolbar"></div>
     <div id="ordersList"></div>
     <div class="refresh-note">מתעדכן אוטומטית כל 30 שניות · <a href="#" onclick="loadOrders(); return false;" style="color:var(--terracotta); font-weight:700;">רענן עכשיו</a></div>
@@ -115,10 +125,29 @@
 // ===== עדכן כאן לכתובת ה-Worker שלך אחרי הפריסה ל-Cloudflare =====
 const API_URL = 'https://borekas-backend.eliran67.workers.dev';
 
-const STATUSES = ['חדשה','בטיפול','נשלחה','הושלמה'];
+let STATUSES = ['חדשה','בטיפול','מוכנה','הושלמה','בוטלה']; // מתעדכן מהשרת
 let currentFilter = 'הכל';
 let allOrders = [];
 let pollTimer = null;
+let knownOrderIds = null; // כדי לזהות הזמנות חדשות ולהשמיע צליל
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// צליל קצר כשנכנסת הזמנה חדשה (עובד אחרי שהייתה לחיצה בדף, למשל כפתור הכניסה)
+function beep(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.25].forEach(t => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0.25, ctx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.2);
+      o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + 0.2);
+    });
+  } catch(e){}
+}
 
 function getToken(){ return localStorage.getItem('borekas_admin_token'); }
 function setToken(t){ localStorage.setItem('borekas_admin_token', t); }
@@ -184,10 +213,27 @@ async function loadOrders(){
     if(res.status === 401){ logout(); return; }
     const data = await res.json();
     allOrders = data.orders || [];
+    if(data.statuses){ STATUSES = data.statuses; renderToolbar(); }
+
+    const ids = new Set(allOrders.map(o => o.id));
+    if(knownOrderIds && allOrders.some(o => !knownOrderIds.has(o.id))){ beep(); }
+    knownOrderIds = ids;
+    const newCount = allOrders.filter(o => o.status === 'חדשה').length;
+    document.title = (newCount ? `(${newCount}) ` : '') + 'לוח בקרה — בורקס עמקה';
+
+    renderEmailAlert(data.lastEmail);
     renderOrders();
   } catch(e){
     // שקט - ננסה שוב בפעם הבאה
   }
+}
+
+function renderEmailAlert(lastEmail){
+  const el = document.getElementById('emailAlert');
+  if(!lastEmail || lastEmail.ok){ el.innerHTML = ''; return; }
+  const when = new Date(lastEmail.at).toLocaleString('he-IL', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'});
+  el.innerHTML = `⚠️ המייל על הזמנה #${esc(lastEmail.orderNum)} (${when}) לא נשלח. ההזמנה עצמה נשמרה כאן.<br>
+    הסיבה מ-EmailJS: <code>${esc(lastEmail.error)}</code>`;
 }
 
 function renderOrders(){
@@ -201,27 +247,23 @@ function renderOrders(){
 
   list.innerHTML = filtered.map(o => {
     const time = new Date(o.createdAt).toLocaleString('he-IL', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'});
-    const itemsHtml = o.items.map(it => {
-      let l = `${it.name} × ${it.qty} — ${it.qty * it.price} ₪`;
-      if(it.sauces && it.sauces.length) l += ` (${it.sauces.join(', ')})`;
-      return l;
-    }).join('<br>');
+    let itemsHtml = o.items.map(it => `${esc(it.name)} × ${it.qty} — ${it.qty * it.price} ₪`).join('<br>');
+    if(o.comboCount > 0) itemsHtml += `<br>מבצע קומבו × ${o.comboCount} — -${o.discount} ₪`;
+    const phoneDigits = String(o.customer.phone || '').replace(/[^\d+]/g, '');
 
     return `
     <div class="order-card">
       <div class="order-top">
         <div>
-          <div class="order-num">#${o.orderNum}</div>
+          <div class="order-num">#${esc(o.orderNum)}</div>
           <div class="order-time">${time}</div>
         </div>
-        <div class="status-badge status-${o.status}">${o.status}</div>
+        <div class="status-badge status-${esc(o.status)}">${esc(o.status)}</div>
       </div>
       <div class="order-items">${itemsHtml}</div>
       <div class="order-cust">
-        👤 ${o.customer.name} · 📞 ${o.customer.phone}<br>
-        📍 ${o.customer.address}
-        ${o.customer.slot ? '<br>🕒 ' + o.customer.slot : ''}
-        ${o.customer.notes ? '<br>📝 ' + o.customer.notes : ''}
+        👤 ${esc(o.customer.name || 'לא צוין')} · 📞 <a href="tel:${esc(phoneDigits)}">${esc(o.customer.phone)}</a>
+        ${o.customer.notes ? '<br>📝 ' + esc(o.customer.notes) : ''}
       </div>
       <div class="order-total">סה״כ: ${o.total} ₪</div>
       <select class="status-select" onchange="updateStatus('${o.id}', this.value)">
