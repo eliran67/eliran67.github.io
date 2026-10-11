@@ -371,6 +371,8 @@
     transition:background .15s ease, transform .15s ease;
   }
   .quick-btn:hover{background:rgba(58,36,20,0.1); transform:translateY(-1px);}
+  .quick-btn-bit{background:#2bd9c3; border-color:#1fb8a5; color:#08332e; font-weight:800;}
+  .quick-btn-bit:hover{background:#25c7b2;}
   .copy-toast{
     display:block; min-height:18px; margin-top:8px; text-align:center;
     font-size:12.5px; font-weight:700; color:var(--ob-gold-deep);
@@ -665,6 +667,9 @@
     </button>
 
     <div class="ob-quick-actions">
+      <a id="pay-bit" class="quick-btn quick-btn-bit" href="https://apps.apple.com/il/app/bit/id1182007739" target="_blank" rel="noopener">
+        <span aria-hidden="true">💸</span> תשלום בביט
+      </a>
       <button type="button" class="quick-btn" data-copy="0549073509" data-label="תשלום">
         <span aria-hidden="true">💳</span> העתקת מספר לביט / פייבוקס
       </button>
@@ -1223,29 +1228,60 @@ function scrollToId(id){
     toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2200);
   }
 
+  // מעתיק טקסט ללוח; מחזיר Promise שמצליח או נכשל
+  function copyText(value){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      return navigator.clipboard.writeText(value);
+    }
+    return new Promise(function(resolve, reject){
+      try{
+        var tmp = document.createElement('textarea');
+        tmp.value = value;
+        tmp.style.position = 'fixed';
+        tmp.style.opacity = '0';
+        document.body.appendChild(tmp);
+        tmp.select();
+        document.execCommand('copy');
+        document.body.removeChild(tmp);
+        resolve();
+      } catch(e){ reject(e); }
+    });
+  }
+
   document.querySelectorAll('.quick-btn[data-copy]').forEach(function(btn){
     btn.addEventListener('click', function(){
       var value = btn.getAttribute('data-copy');
       var label = btn.getAttribute('data-label') || '';
-      var done = function(){ showToast('המספר הועתק! אפשר להדביק ב' + label); };
-      var fail = function(){ showToast('לא הצלחנו להעתיק - המספר: ' + value); };
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(value).then(done, fail);
-      } else {
-        try{
-          var tmp = document.createElement('textarea');
-          tmp.value = value;
-          tmp.style.position = 'fixed';
-          tmp.style.opacity = '0';
-          document.body.appendChild(tmp);
-          tmp.select();
-          document.execCommand('copy');
-          document.body.removeChild(tmp);
-          done();
-        } catch(e){ fail(); }
-      }
+      copyText(value).then(
+        function(){ showToast('המספר הועתק! אפשר להדביק ב' + label); },
+        function(){ showToast('לא הצלחנו להעתיק - המספר: ' + value); }
+      );
     });
   });
+
+  // כפתור "תשלום בביט": ביט לא מאפשרת קישור עם סכום ממולא לחשבון פרטי,
+  // אז מעתיקים את המספר, מציגים את הסכום, ופותחים את האפליקציה (באנדרואיד) או את הדף שלה ב-App Store (באייפון)
+  var BIT_PHONE = '0549073509';
+  var BIT_ANDROID = 'intent://#Intent;package=com.bnhp.payments.paymentsapp;S.browser_fallback_url=' +
+    encodeURIComponent('https://play.google.com/store/search?q=%D7%91%D7%99%D7%98%20bit&c=apps') + ';end';
+  var bitBtn = document.getElementById('pay-bit');
+  if(bitBtn){
+    bitBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      var totalText = (document.getElementById('ob-total') || {}).textContent || '';
+      var hasTotal = totalText && totalText.trim() !== '0 ₪';
+      var msg = 'המספר ' + BIT_PHONE + ' הועתק' + (hasTotal ? ' · לתשלום: ' + totalText.trim() : '') + ' - פותחים את ביט...';
+      copyText(BIT_PHONE).catch(function(){});
+      showToast(msg);
+      if(/android/i.test(navigator.userAgent)){
+        // השהייה קצרה כדי שהלקוח יספיק לראות את הסכום (עדיין בתוך חלון הלחיצה של הדפדפן)
+        setTimeout(function(){ window.location.href = BIT_ANDROID; }, 1200);
+      } else {
+        // באייפון/מחשב פותחים מיד, אחרת הדפדפן חוסם את החלון החדש
+        window.open(bitBtn.href, '_blank', 'noopener');
+      }
+    });
+  }
 })();
 </script>
 
