@@ -1262,8 +1262,10 @@ function scrollToId(id){
   // כפתור "תשלום בביט": ביט לא מאפשרת קישור עם סכום ממולא לחשבון פרטי,
   // אז מעתיקים את המספר, מציגים את הסכום, ופותחים את האפליקציה (באנדרואיד) או את הדף שלה ב-App Store (באייפון)
   var BIT_PHONE = '0549073509';
-  var BIT_ANDROID = 'intent://#Intent;package=com.bnhp.payments.paymentsapp;S.browser_fallback_url=' +
-    encodeURIComponent('https://play.google.com/store/search?q=%D7%91%D7%99%D7%98%20bit&c=apps') + ';end';
+  // פותח את המסך הראשי של ביט (כמו לחיצה על האייקון); אם ביט לא מותקנת - עובר לדף שלה בחנות
+  var BIT_ANDROID = 'intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;' +
+    'package=com.bnhp.payments.paymentsapp;S.browser_fallback_url=' +
+    encodeURIComponent('https://play.google.com/store/apps/details?id=com.bnhp.payments.paymentsapp') + ';end';
   var bitBtn = document.getElementById('pay-bit');
   if(bitBtn){
     bitBtn.addEventListener('click', function(e){
