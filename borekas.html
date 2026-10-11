@@ -3,8 +3,84 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>בורקס עמקה | מהתנור ישר אליך</title>
+<title>בורקס עמקה | בורקס חם וטרי בעמקה - הזמנות בוואטסאפ</title>
+<meta name="description" content="בורקס עמקה - בורקס חם וטרי ביישוב עמקה: גבינה, תרד, תפו״א ופטריות ב-25 ₪, ביצה וטרופית בתוספת. הזמנות ימים א׳-ה׳ 09:00-21:00 בוואטסאפ או בטלפון 054-9073509.">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#2E1B12">
+<!-- כתובת האתר הקבועה: אם משנים כתובת/דומיין, לעדכן כאן, ב-og:url, ב-og:image וב-JSON-LD למטה -->
+<link rel="canonical" href="https://eliran67.github.io/borekas.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🥐%3C/text%3E%3C/svg%3E">
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="he_IL">
+<meta property="og:site_name" content="בורקס עמקה">
+<meta property="og:title" content="בורקס עמקה | בורקס חם וטרי בעמקה">
+<meta property="og:description" content="בורקס חם וטרי, 25 ₪ לכל הטעמים. ביצה וטרופית בתוספת, או קומבו ב-30 ₪. הזמנות עד 21:00.">
+<meta property="og:url" content="https://eliran67.github.io/borekas.html">
+<meta property="og:image" content="https://eliran67.github.io/images/burekas-cheese.jpg">
+<meta property="og:image:width" content="600">
+<meta property="og:image:height" content="450">
+<meta property="og:image:alt" content="בורקס גבינה של בורקס עמקה, מוגש עם ביצה קשה ומלפפון חמוץ">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="בורקס עמקה | בורקס חם וטרי בעמקה">
+<meta name="twitter:description" content="בורקס חם וטרי, 25 ₪ לכל הטעמים. הזמנות עד 21:00 בוואטסאפ או בטלפון.">
+<meta name="twitter:image" content="https://eliran67.github.io/images/burekas-cheese.jpg">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  "name": "בורקס עמקה",
+  "url": "https://eliran67.github.io/borekas.html",
+  "image": "https://eliran67.github.io/images/burekas-cheese.jpg",
+  "description": "בורקס חם וטרי ביישוב עמקה, מגוון מילויים, ביצה וטרופית בתוספת. הזמנות בוואטסאפ או בטלפון.",
+  "servesCuisine": "בורקס ומאפי בצק עלים",
+  "telephone": "+972-54-9073509",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "הכרם 48",
+    "addressLocality": "עמקה",
+    "addressCountry": "IL"
+  },
+  "areaServed": "עמקה והסביבה",
+  "priceRange": "₪",
+  "acceptsReservations": false,
+  "paymentAccepted": "Cash, Bit, PayBox",
+  "hasMenu": {
+    "@type": "Menu",
+    "name": "תפריט בורקס עמקה",
+    "hasMenuSection": [
+      {
+        "@type": "MenuSection",
+        "name": "בורקס",
+        "hasMenuItem": [
+          {"@type":"MenuItem","name":"בורקס גבינה עשירה","offers":{"@type":"Offer","price":"25","priceCurrency":"ILS"}},
+          {"@type":"MenuItem","name":"בורקס תרד וגבינות קלאסי","offers":{"@type":"Offer","price":"25","priceCurrency":"ILS"}},
+          {"@type":"MenuItem","name":"בורקס תפוח אדמה נימוח","offers":{"@type":"Offer","price":"25","priceCurrency":"ILS"}},
+          {"@type":"MenuItem","name":"בורקס פטריות ותפו\"א","offers":{"@type":"Offer","price":"25","priceCurrency":"ILS"}}
+        ]
+      },
+      {
+        "@type": "MenuSection",
+        "name": "תוספות",
+        "hasMenuItem": [
+          {"@type":"MenuItem","name":"ביצה","offers":{"@type":"Offer","price":"3","priceCurrency":"ILS"}},
+          {"@type":"MenuItem","name":"טרופית","offers":{"@type":"Offer","price":"3","priceCurrency":"ILS"}},
+          {"@type":"MenuItem","name":"קומבו בורקס + ביצה + טרופית","offers":{"@type":"Offer","price":"30","priceCurrency":"ILS"}}
+        ]
+      }
+    ]
+  },
+  "openingHoursSpecification": {
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Sunday","Monday","Tuesday","Wednesday","Thursday"],
+    "opens": "09:00",
+    "closes": "21:00"
+  }
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Rubik:wght@600;700;800;900&family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -23,6 +99,8 @@
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
+  /* שהכותרת הדביקה לא תסתיר את תחילת האזור אחרי קפיצה אליו */
+  section, footer{scroll-margin-top:76px;}
   body{
     font-family:'Heebo', sans-serif;
     background:var(--cream);
@@ -85,17 +163,6 @@
     white-space:nowrap;
   }
 
-  /* ===== urgency strip ===== */
-  .urgency{
-    background:linear-gradient(90deg, var(--terracotta), #a83f1e);
-    color:#fff;
-    text-align:center;
-    font-size:13px;
-    font-weight:600;
-    padding:9px 14px;
-    letter-spacing:.2px;
-  }
-
   /* ===== hero ===== */
   .hero{
     background:
@@ -136,7 +203,44 @@
   }
   .feature-pill .lbl{display:flex; align-items:center; gap:8px; opacity:0.9;}
   .feature-pill .val{color:var(--crust-light); font-weight:700;}
-  .feature-pill.kosher{justify-content:center; gap:8px; color:var(--tile); background:rgba(31,122,108,0.14); border-color:rgba(31,122,108,0.35);}
+  .feature-pill.status-pill{justify-content:center; gap:8px;}
+  .status-dot{width:9px; height:9px; border-radius:50%; background:#9a9488; flex:none;}
+  .status-pill.is-open{color:#7ee2a0; background:rgba(37,211,102,0.12); border-color:rgba(37,211,102,0.35);}
+  .status-pill.is-open .status-dot{background:#25D366; animation:status-pulse 1.8s ease-out infinite;}
+  .status-pill.is-closed{color:var(--crust-light);}
+  .status-pill.is-closed .status-dot{background:var(--crust);}
+  @keyframes status-pulse{0%{box-shadow:0 0 0 0 rgba(37,211,102,0.5);} 70%{box-shadow:0 0 0 7px rgba(37,211,102,0);} 100%{box-shadow:0 0 0 0 rgba(37,211,102,0);}}
+
+  .ob-closed-note{
+    background:rgba(232,163,61,0.12); border:1px solid rgba(232,163,61,0.4); color:#7a5212;
+    border-radius:12px; padding:10px 12px; font-size:13px; line-height:1.6; text-align:center; margin-top:14px;
+  }
+  .ob-closed-note[hidden]{display:none;}
+
+  /* ===== floating whatsapp button ===== */
+  .fab-whatsapp{
+    position:fixed; bottom:20px; left:20px; z-index:80;
+    width:58px; height:58px; border-radius:50%;
+    background:#25D366; color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 18px rgba(18,140,62,0.4);
+    transition:transform .15s ease;
+  }
+  .fab-whatsapp:hover, .fab-whatsapp:focus-visible{transform:scale(1.08);}
+  /* מוסתר בזמן שטופס ההזמנה על המסך, כדי שלא יכסה את כפתורי ה-+ */
+  .fab-whatsapp.is-hidden{opacity:0; transform:scale(0.6); pointer-events:none; visibility:hidden; transition:opacity .2s ease, transform .2s ease, visibility .2s;}
+  .fab-whatsapp svg{width:30px; height:30px;}
+
+  .feature-pill.kosher{justify-content:center; gap:8px; color:#8fd9c8; background:rgba(31,122,108,0.18); border-color:rgba(31,122,108,0.45);}
+
+  .hero-actions{display:flex; gap:10px; justify-content:center; margin:0 auto 20px; max-width:360px;}
+  .hero-btn{
+    flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    padding:13px 16px; border-radius:999px; font-size:15px; font-weight:800;
+  }
+  .hero-btn.primary{background:var(--crust); color:var(--coffee); box-shadow:0 4px 0 #b97c22;}
+  .hero-btn.primary:active{transform:translateY(3px); box-shadow:none;}
+  .hero-btn.secondary{background:transparent; color:var(--cream); border:1.5px solid rgba(255,255,255,0.4);}
 
   /* ===== menu section ===== */
   .menu-section{padding:34px 18px 10px;}
@@ -254,6 +358,9 @@
   }
   .ob-send-btn:hover{filter:brightness(1.08);}
   .ob-send-btn:active{transform:translateY(4px); box-shadow:none;}
+  .ob-error{color:#b3261e; font-size:13.5px; font-weight:600; text-align:center; margin-top:12px;}
+  .ob-error:empty{display:none;}
+  .ob-input[aria-invalid="true"]{border-color:#b3261e;}
   .ob-send-btn:disabled{background:#cbbfa8; color:#8a7f6c; box-shadow:none; cursor:not-allowed; filter:none; transform:none;}
 
   .ob-quick-actions{display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:14px;}
@@ -318,11 +425,73 @@
     font-weight:700; font-size:13px;
     padding:9px 16px; border-radius:999px;
   }
-  .fine-print{text-align:center; font-size:11px; opacity:0.5; margin-top:22px; line-height:1.7;}
+  .fine-print{text-align:center; font-size:11.5px; opacity:0.75; margin-top:22px; line-height:1.7;}
+
+  /* ===== נגישות ===== */
+  :focus-visible{outline:3px solid var(--crust); outline-offset:3px;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+    html{scroll-behavior:auto;}
+  }
+  .skip-link{
+    position:absolute; right:12px; top:-60px; z-index:300;
+    background:var(--coffee); color:var(--cream);
+    padding:10px 18px; border-radius:0 0 10px 10px;
+    font-size:14px; font-weight:700; transition:top .2s ease;
+  }
+  .skip-link:focus{top:0;}
+
+  /* ===== קישורי מדיניות + חלונות ===== */
+  .legal-links{display:flex; justify-content:center; align-items:center; gap:8px; margin-top:16px;}
+  .legal-link{background:transparent; color:var(--crust-light); font-size:12.5px; font-weight:600; padding:4px; text-decoration:underline;}
+  .legal-sep{opacity:0.5; font-size:11px;}
+  .modal-overlay{position:fixed; inset:0; z-index:200; background:rgba(32,19,10,0.55);}
+  .modal-overlay[hidden]{display:none;}
+  .modal{
+    position:fixed; top:50%; left:50%; z-index:205;
+    width:min(92vw,500px); max-height:min(82vh,640px);
+    background:var(--cream); color:var(--ink); border-radius:20px;
+    box-shadow:0 20px 50px rgba(32,19,10,0.35);
+    display:flex; flex-direction:column;
+    transform:translate(-50%,-50%);
+  }
+  .modal[hidden]{display:none;}
+  .modal-head{display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--line); flex:none;}
+  .modal-head h3{font-size:18px; font-weight:800; color:var(--coffee-2);}
+  .modal-close{width:34px; height:34px; border-radius:50%; background:transparent; color:var(--ink); font-size:16px;}
+  .modal-close:hover{background:rgba(58,36,20,0.08);}
+  .modal-body{padding:16px 20px 22px; overflow-y:auto; font-size:14px; line-height:1.8; color:#4a3626;}
+  .modal-body p{margin-bottom:12px;}
+  .modal-body h4{font-size:14.5px; font-weight:800; color:var(--coffee-2); margin:14px 0 4px;}
+  .modal-body ul{padding-right:20px; margin-bottom:12px;}
+  .modal-body a{color:var(--terracotta); text-decoration:underline;}
+
+  /* ===== gallery ===== */
+  .gallery{padding:30px 18px 6px;}
+  .gallery-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:560px; margin:0 auto;}
+  .gallery-grid figure{border-radius:16px; overflow:hidden; box-shadow:var(--shadow); border:3px solid #fff; background:#fff;}
+  .gallery-grid figure:first-child{grid-column:1 / -1;}
+  .gallery-grid img{width:100%; height:auto; aspect-ratio:4/3; object-fit:cover; display:block;}
+  .gallery-grid figcaption{font-size:12.5px; font-weight:600; color:#6b5644; padding:8px 10px; text-align:center;}
+
+  /* ===== FAQ ===== */
+  .faq{padding:30px 18px 34px;}
+  .faq-list{max-width:560px; margin:0 auto; display:flex; flex-direction:column; gap:10px;}
+  .faq-list details{background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px 16px;}
+  .faq-list summary{
+    cursor:pointer; list-style:none; font-weight:700; font-size:14.5px; color:var(--coffee-2);
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+  }
+  .faq-list summary::-webkit-details-marker{display:none;}
+  .faq-list summary::after{content:"+"; font-size:18px; color:var(--terracotta); flex:none;}
+  .faq-list details[open] summary::after{content:"−";}
+  .faq-list details p{font-size:13.5px; color:#6b5644; line-height:1.7; margin-top:10px;}
 
 </style>
 </head>
 <body>
+
+<a class="skip-link" href="#menu">דלגו להזמנה</a>
 
 <header class="site">
   <div class="brand">
@@ -338,17 +507,37 @@
   </div>
 </header>
 
-<div class="urgency">🥟 בצק עלים טורקי פריך שנאפה כל שעה במקום!</div>
-
+<main>
 <section class="hero">
   <h1>בורקס עמקה ישר <span>מהתנור</span></h1>
-  <p>הבורקסים הקלאסיים: גבינה, גבינה תרד, תפו״א ותפו״א פטריות — נאפים במקום ומוגשים חמים.</p>
+  <p>הבורקסים הקלאסיים: גבינה, גבינה תרד, תפו״א ותפו״א פטריות — נאפים במקום בעמקה ומוגשים חמים.</p>
+  <div class="hero-actions">
+    <a class="hero-btn primary" href="#menu">הזמינו עכשיו</a>
+    <a class="hero-btn secondary" href="tel:0549073509">📞 התקשרו</a>
+  </div>
   <div class="feature-row">
+    <div class="feature-pill status-pill" id="status-pill" role="status">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span id="status-text">פתוח א׳-ה׳ 09:00-21:00</span>
+    </div>
     <div class="feature-pill kosher">✅ כשר — בד״ץ בית יוסף</div>
   </div>
 </section>
 
 <div class="phyllo"></div>
+
+<section class="gallery" aria-labelledby="gallery-title">
+  <div class="menu-head">
+    <span class="eyebrow">ישר מהתנור</span>
+    <h2 id="gallery-title">הבורקס של בורקס עמקה</h2>
+  </div>
+  <div class="gallery-grid">
+    <figure>
+      <img src="images/burekas-cheese.jpg" alt="בורקס גבינה של בורקס עמקה, מוגש עם ביצה קשה, מלפפון חמוץ ורסק עגבניות" width="600" height="450">
+      <figcaption>בורקס גבינה עשירה עם ביצה קשה</figcaption>
+    </figure>
+  </div>
+</section>
 
 <section class="menu-section ob-wrap" id="menu">
   <div class="menu-head">
@@ -449,6 +638,9 @@
       <label class="ob-field-label" for="customer-name">שם המזמין <span class="ob-field-hint">(לא חובה)</span></label>
       <input type="text" id="customer-name" class="ob-input" placeholder="איך נקרא לכם?" autocomplete="name" maxlength="40">
 
+      <label class="ob-field-label ob-field-label-spaced" for="customer-phone">טלפון <span class="ob-field-hint">(כדי שנוכל לחזור אליכם)</span></label>
+      <input type="tel" id="customer-phone" class="ob-input" placeholder="050-0000000" autocomplete="tel" inputmode="tel" maxlength="20" required aria-describedby="ob-error">
+
       <label class="ob-field-label ob-field-label-spaced" for="customer-notes">הערות מיוחדות <span class="ob-field-hint">(לא חובה)</span></label>
       <input type="text" id="customer-notes" class="ob-input" placeholder="למשל: שעת איסוף, בלי שומשום" maxlength="80">
     </div>
@@ -461,6 +653,12 @@
         <span id="ob-total">0 ₪</span>
       </div>
     </div>
+
+    <div id="ob-closed-note" class="ob-closed-note" hidden>
+      🌙 אנחנו סגורים כרגע (פתוח א׳-ה׳ 09:00-21:00). אפשר לשלוח הזמנה - נחזור אליכם כשנפתח.
+    </div>
+
+    <div id="ob-error" class="ob-error" role="alert"></div>
 
     <button type="button" id="ob-send" class="ob-send-btn" disabled aria-disabled="true">
       לשלוח את ההזמנה החמה בוואטסאפ
@@ -478,9 +676,48 @@
   </form>
 </section>
 
+<section class="faq" id="faq" aria-labelledby="faq-title">
+  <div class="menu-head">
+    <span class="eyebrow">שאלות נפוצות</span>
+    <h2 id="faq-title">כל מה שרציתם לדעת על בורקס עמקה</h2>
+  </div>
+  <!-- התשובות כאן מופיעות גם ב-JSON-LD (FAQPage) בסוף הקובץ - אם משנים פה, לעדכן גם שם -->
+  <div class="faq-list">
+    <details>
+      <summary>איפה נמצא בורקס עמקה?</summary>
+      <p>ברחוב הכרם 48 ביישוב עמקה. אפשר לנווט אלינו ישירות ב-Waze מהכפתור שבתפריט.</p>
+    </details>
+    <details>
+      <summary>מה שעות הפעילות?</summary>
+      <p>אנחנו פתוחים בימים א׳-ה׳ בין 09:00 ל-21:00. כדאי להזמין לפחות שעה מראש כדי שהבורקס ייצא חם מהתנור בדיוק בזמן.</p>
+    </details>
+    <details>
+      <summary>איך מזמינים בורקס?</summary>
+      <p>בונים את המגש כאן באתר ולוחצים על "לשלוח את ההזמנה החמה בוואטסאפ", ונפתחת הודעה מוכנה. אפשר גם להתקשר אלינו: 054-9073509.</p>
+    </details>
+    <details>
+      <summary>כמה עולה בורקס?</summary>
+      <p>כל בורקס עולה 25 ₪. תוספת ביצה או טרופית עולה 3 ₪, ומבצע קומבו של בורקס עם ביצה וטרופית עולה 30 ₪.</p>
+    </details>
+    <details>
+      <summary>אילו סוגי בורקס יש?</summary>
+      <p>גבינה עשירה, תרד וגבינות קלאסי, תפוח אדמה נימוח ופטריות ותפו״א - כולם בבצק עלים פריך שנאפה במקום.</p>
+    </details>
+    <details>
+      <summary>האם הבורקס כשר?</summary>
+      <p>כן, הבורקסים בכשרות בד״ץ בית יוסף.</p>
+    </details>
+    <details>
+      <summary>איך משלמים?</summary>
+      <p>אפשר לשלם בביט, בפייבוקס או במזומן.</p>
+    </details>
+  </div>
+</section>
+</main>
+
 <div class="phyllo"></div>
 
-<section class="about" id="about">
+<footer class="about" id="about">
   <div class="about-head">
     <div class="flame">🔥</div>
     <div class="name">בורקס עמקה</div>
@@ -500,8 +737,169 @@
     <div class="info-row"><span class="l">📌</span><span>יש להזמין לפחות שעה מראש</span></div>
   </div>
 
+  <div class="legal-links">
+    <button type="button" class="legal-link" data-open-modal="modal-privacy">מדיניות פרטיות</button>
+    <span class="legal-sep" aria-hidden="true">·</span>
+    <button type="button" class="legal-link" data-open-modal="modal-accessibility">הצהרת נגישות</button>
+  </div>
+
   <div class="fine-print">© 2026 בורקס עמקה · כל הזכויות שמורות<br>נאפה באהבה ❤️ לחווית בורקס טורקי מושלמת</div>
-</section>
+</footer>
+
+<a class="fab-whatsapp" href="https://wa.me/972549073509?text=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%94%D7%96%D7%9E%D7%99%D7%9F%20%D7%91%D7%95%D7%A8%D7%A7%D7%A1" target="_blank" rel="noopener" aria-label="שליחת הודעה בוואטסאפ">
+  <svg viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M16 3C8.8 3 3 8.8 3 16c0 2.3.6 4.5 1.7 6.4L3 29l6.8-1.8c1.9 1 4 1.6 6.2 1.6 7.2 0 13-5.8 13-13S23.2 3 16 3Zm0 23.6c-2 0-3.9-.5-5.5-1.5l-.4-.2-4 1.1 1.1-3.9-.3-.4A10.5 10.5 0 1 1 16 26.6Zm5.8-7.9c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.2-.2-.3 0-.5.1-.7l.5-.6.3-.5c.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.7s1.2 3.1 1.4 3.4c.2.2 2.4 3.6 5.7 5 .8.3 1.4.5 1.9.7.8.3 1.5.2 2.1.1.6-.1 1.9-.8 2.2-1.5.3-.7.3-1.4.2-1.5-.1-.2-.3-.2-.6-.4Z"/>
+  </svg>
+</a>
+
+<script>
+(function(){
+  // פתוח/סגור לפי שעון ישראל (לא לפי שעון המכשיר): א׳-ה׳ 09:00-21:00
+  var OPEN_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu'];
+  var OPEN_MIN = 9 * 60, CLOSE_MIN = 21 * 60;
+
+  function isOpenNow(){
+    var parts = {};
+    new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Jerusalem', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+      .formatToParts(new Date()).forEach(function(p){ parts[p.type] = p.value; });
+    var minutes = parseInt(parts.hour, 10) * 60 + parseInt(parts.minute, 10);
+    return OPEN_DAYS.indexOf(parts.weekday) !== -1 && minutes >= OPEN_MIN && minutes < CLOSE_MIN;
+  }
+
+  function update(){
+    var open = isOpenNow();
+    var pill = document.getElementById('status-pill');
+    pill.classList.toggle('is-open', open);
+    pill.classList.toggle('is-closed', !open);
+    document.getElementById('status-text').textContent = open ? 'פתוח עכשיו · עד 21:00' : 'סגור כרגע · פתוח א׳-ה׳ 09:00-21:00';
+    document.getElementById('ob-closed-note').hidden = open;
+  }
+
+  update();
+  setInterval(update, 60 * 1000);
+})();
+
+(function(){
+  // הכפתור הצף מוסתר כשטופס ההזמנה על המסך (שם כבר יש כפתור שליחה לוואטסאפ)
+  var fab = document.querySelector('.fab-whatsapp');
+  var form = document.getElementById('order-form');
+  if(!fab || !form || !('IntersectionObserver' in window)) return;
+  new IntersectionObserver(function(entries){
+    fab.classList.toggle('is-hidden', entries[0].isIntersecting);
+  }).observe(form);
+})();
+</script>
+
+<div class="modal-overlay" id="modal-overlay" hidden></div>
+
+<!-- מדיניות פרטיות: מתארת מה האתר באמת עושה עם המידע. אם משנים את אופן שליחת/שמירת ההזמנות - לעדכן גם כאן -->
+<div class="modal" id="modal-privacy" role="dialog" aria-modal="true" aria-labelledby="modal-privacy-title" hidden>
+  <div class="modal-head">
+    <h3 id="modal-privacy-title">מדיניות פרטיות</h3>
+    <button type="button" class="modal-close" data-close-modal aria-label="סגירת חלון מדיניות פרטיות">✕</button>
+  </div>
+  <div class="modal-body">
+    <p>עודכן לאחרונה: אוקטובר 2026.</p>
+    <h4>איזה מידע נאסף</h4>
+    <p>כשאתם שולחים הזמנה דרך האתר, נשמרים: הפריטים שבחרתם, הסכום, שעת ההזמנה, מספר הטלפון שלכם, ואם מילאתם - השם וההערות שכתבתם. לא נאספים כתובת או אמצעי תשלום דרך האתר.</p>
+    <h4>למה המידע משמש</h4>
+    <p>אך ורק כדי להכין את ההזמנה שלכם וליצור איתכם קשר לגביה. איננו שולחים דיוור פרסומי ואיננו מוכרים או מעבירים מידע לגורמים אחרים.</p>
+    <h4>איפה המידע נשמר</h4>
+    <ul>
+      <li>ההזמנה נשמרת במערכת ניהול ההזמנות של העסק (בשרתי Cloudflare) ונשלחת אלינו במייל (באמצעות השירות EmailJS).</li>
+      <li>לאחר מכן נפתחת אצלכם הודעת וואטסאפ עם פרטי ההזמנה, שאתם שולחים אלינו מהוואטסאפ שלכם.</li>
+      <li>השם, הטלפון והמגש האחרון נשמרים גם בדפדפן שלכם בלבד (localStorage), כדי שלא תצטרכו להקליד אותם שוב. אפשר למחוק אותם בניקוי נתוני האתר בדפדפן.</li>
+    </ul>
+    <h4>עוגיות ושירותים חיצוניים</h4>
+    <p>האתר לא משתמש בעוגיות מעקב או בפרסום. הגופנים באתר נטענים מ-Google Fonts, ולכן גוגל מקבלת את כתובת ה-IP של המכשיר בעת טעינת הדף.</p>
+    <h4>הזכויות שלכם</h4>
+    <p>אפשר לבקש לעיין במידע שנשמר עליכם, לתקן אותו או למחוק אותו - בטלפון <a href="tel:0549073509">054-9073509</a>. הזמנות שהושלמו נמחקות אוטומטית לאחר שנה.</p>
+  </div>
+</div>
+
+<!-- הצהרת נגישות: לעדכן כאן את פרטי רכז/ת הנגישות אם יש -->
+<div class="modal" id="modal-accessibility" role="dialog" aria-modal="true" aria-labelledby="modal-accessibility-title" hidden>
+  <div class="modal-head">
+    <h3 id="modal-accessibility-title">הצהרת נגישות</h3>
+    <button type="button" class="modal-close" data-close-modal aria-label="סגירת חלון הצהרת נגישות">✕</button>
+  </div>
+  <div class="modal-body">
+    <p>בורקס עמקה רואה חשיבות במתן שירות שוויוני לכל הלקוחות, ופועלת כדי שהאתר יהיה נגיש גם לאנשים עם מוגבלות.</p>
+    <h4>מה נעשה באתר</h4>
+    <ul>
+      <li>ניווט מלא במקלדת, עם סימון בולט של הרכיב שבפוקוס, וקישור "דלגו להזמנה" בתחילת הדף.</li>
+      <li>תגיות מתאימות לקוראי מסך (כותרות מסודרות, תוויות לכפתורים ולשדות, הכרזה על שינויי כמות וסכום).</li>
+      <li>טקסט חלופי לתמונות.</li>
+      <li>ניגודיות צבעים נוחה לקריאה, ותצוגה מותאמת לטלפון ולמחשב.</li>
+      <li>כיבוי אנימציות למי שהגדיר זאת במכשיר ("הפחתת תנועה").</li>
+    </ul>
+    <p>האתר נבנה בשאיפה לעמוד בתקן הישראלי 5568 ובהנחיות WCAG 2.0 ברמה AA. ייתכן שעדיין קיימים חלקים שאינם נגישים במלואם, ואנחנו ממשיכים לשפר.</p>
+    <h4>נתקלתם בבעיה?</h4>
+    <p>אם נתקלתם בקושי באתר, או שאתם צריכים עזרה בביצוע הזמנה - נשמח לעזור ולקבל את ההזמנה גם בטלפון: <a href="tel:0549073509">054-9073509</a>.</p>
+    <p>ההצהרה עודכנה באוקטובר 2026.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  // חלונות מדיניות פרטיות / הצהרת נגישות: פתיחה, סגירה ב-Esc/רקע, והחזרת הפוקוס לכפתור שפתח
+  var overlay = document.getElementById('modal-overlay');
+  var current = null;
+  var opener = null;
+
+  function open(id, btn){
+    current = document.getElementById(id);
+    opener = btn;
+    overlay.hidden = false;
+    current.hidden = false;
+    document.body.style.overflow = 'hidden';
+    current.querySelector('.modal-close').focus();
+  }
+  function close(){
+    if(!current) return;
+    current.hidden = true;
+    overlay.hidden = true;
+    document.body.style.overflow = '';
+    current = null;
+    if(opener){ opener.focus(); }
+  }
+
+  document.querySelectorAll('[data-open-modal]').forEach(function(btn){
+    btn.addEventListener('click', function(){ open(btn.getAttribute('data-open-modal'), btn); });
+  });
+  document.querySelectorAll('[data-close-modal]').forEach(function(btn){
+    btn.addEventListener('click', close);
+  });
+  overlay.addEventListener('click', close);
+  document.addEventListener('keydown', function(e){
+    if(!current) return;
+    if(e.key === 'Escape'){ close(); return; }
+    // שומרים את הפוקוס בתוך החלון בזמן שהוא פתוח
+    if(e.key === 'Tab'){
+      var f = current.querySelectorAll('button, a[href]');
+      var first = f[0], last = f[f.length - 1];
+      if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    }
+  });
+})();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type":"Question","name":"איפה נמצא בורקס עמקה?","acceptedAnswer":{"@type":"Answer","text":"ברחוב הכרם 48 ביישוב עמקה. אפשר לנווט אלינו ישירות ב-Waze."}},
+    {"@type":"Question","name":"מה שעות הפעילות?","acceptedAnswer":{"@type":"Answer","text":"אנחנו פתוחים בימים א׳-ה׳ בין 09:00 ל-21:00. כדאי להזמין לפחות שעה מראש."}},
+    {"@type":"Question","name":"איך מזמינים בורקס?","acceptedAnswer":{"@type":"Answer","text":"בונים את המגש באתר ושולחים את ההזמנה בוואטסאפ, או מתקשרים ל-054-9073509."}},
+    {"@type":"Question","name":"כמה עולה בורקס?","acceptedAnswer":{"@type":"Answer","text":"כל בורקס עולה 25 ₪. תוספת ביצה או טרופית עולה 3 ₪, ומבצע קומבו של בורקס עם ביצה וטרופית עולה 30 ₪."}},
+    {"@type":"Question","name":"אילו סוגי בורקס יש?","acceptedAnswer":{"@type":"Answer","text":"גבינה עשירה, תרד וגבינות קלאסי, תפוח אדמה נימוח ופטריות ותפו״א - כולם בבצק עלים פריך שנאפה במקום."}},
+    {"@type":"Question","name":"האם הבורקס כשר?","acceptedAnswer":{"@type":"Answer","text":"כן, הבורקסים בכשרות בד״ץ בית יוסף."}},
+    {"@type":"Question","name":"איך משלמים?","acceptedAnswer":{"@type":"Answer","text":"אפשר לשלם בביט, בפייבוקס או במזומן."}}
+  ]
+}
+</script>
 
 
 <script>
@@ -539,6 +937,7 @@ function scrollToId(id){
 
   var COMBO_SAVING = 1; // בורקס(25) + ביצה(3) + טרופית(3) = 31, במבצע קומבו 30 -> חיסכון של 1 ₪ ליחידה
   var NAME_STORAGE_KEY = 'burekas_amaka_customer_name';
+  var PHONE_STORAGE_KEY = 'burekas_amaka_customer_phone';
   var CART_STORAGE_KEY = 'burekas_amaka_cart_state';
   var LAST_ORDER_KEY = 'burekas_amaka_last_order';
 
@@ -547,6 +946,8 @@ function scrollToId(id){
   var totalEl = document.getElementById('ob-total');
   var sendBtn = document.getElementById('ob-send');
   var nameInput = document.getElementById('customer-name');
+  var phoneInput = document.getElementById('customer-phone');
+  var errorEl = document.getElementById('ob-error');
   var notesInput = document.getElementById('customer-notes');
   var resetBtn = document.getElementById('ob-reset');
   var restoreRow = document.getElementById('ob-restore-row');
@@ -557,6 +958,8 @@ function scrollToId(id){
   try{
     var savedName = localStorage.getItem(NAME_STORAGE_KEY);
     if(savedName){ nameInput.value = savedName; }
+    var savedPhone = localStorage.getItem(PHONE_STORAGE_KEY);
+    if(savedPhone){ phoneInput.value = savedPhone; }
   } catch(e){ /* localStorage לא זמין - ממשיכים בלי שחזור */ }
 
   function saveCart(){
@@ -669,40 +1072,41 @@ function scrollToId(id){
     try{ localStorage.setItem(NAME_STORAGE_KEY, nameInput.value.trim()); } catch(e){}
   });
 
-  // שמירת ההזמנה בשרת (לוח הניהול + מייל). מחזיר את מספר ההזמנה, או null אם נכשל.
-  // ההזמנה ממשיכה לוואטסאפ גם אם השרת לא הגיב - כדי שלא תלך לאיבוד.
-  async function saveOrderToServer(result, customerName, customerNotes){
-    var items = result.lines.map(function(line){
-      return { name: line.label, qty: line.qty, price: line.price };
+  function showError(msg){
+    errorEl.textContent = msg || '';
+  }
+
+  function phoneIsValid(value){
+    var digits = value.replace(/\D/g, '');
+    return digits.length >= 9 && digits.length <= 12;
+  }
+
+  phoneInput.addEventListener('input', function(){
+    phoneInput.removeAttribute('aria-invalid');
+    showError('');
+  });
+
+  // שמירת ההזמנה בשרת (לוח הניהול + מייל). השרת מחשב את המחיר בעצמו - שולחים רק כמויות.
+  // מחזיר { orderNum } בהצלחה, { error } אם השרת דחה את ההזמנה, או null אם לא הייתה תשובה.
+  async function saveOrderToServer(customerName, customerPhone, customerNotes){
+    var items = {};
+    Object.keys(STATE).forEach(function(key){
+      if(STATE[key] > 0){ items[key] = STATE[key]; }
     });
-    if(result.comboCount > 0){
-      items.push({ name: 'הנחת קומבו (בורקס+ביצה+טרופית)', qty: result.comboCount, price: -COMBO_SAVING });
-    }
-    var payload = {
-      customer: {
-        name: customerName || 'לא צוין',
-        phone: 'בוואטסאפ',
-        address: 'איסוף עצמי',
-        slot: '',
-        notes: customerNotes
-      },
-      items: items,
-      subtotal: result.subtotal,
-      delivery: 0,
-      total: result.total
-    };
     var controller = new AbortController();
     var timer = setTimeout(function(){ controller.abort(); }, 8000);
     try{
       var res = await fetch(API_URL + '/api/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ items: items, name: customerName, phone: customerPhone, notes: customerNotes }),
         signal: controller.signal
       });
-      if(!res.ok) return null;
-      var data = await res.json();
-      return data.orderNum || null;
+      var data = await res.json().catch(function(){ return {}; });
+      if(res.ok){ return { orderNum: data.orderNum || null }; }
+      if(res.status === 400){ return { error: data.error || 'לא הצלחנו לקבל את ההזמנה' }; }
+      // 429 (הגבלת קצב) ושגיאות שרת: לא חוסמים את הלקוח - ממשיכים לוואטסאפ בלי מספר הזמנה
+      return null;
     } catch(e){
       return null;
     } finally {
@@ -715,18 +1119,39 @@ function scrollToId(id){
     if(result.total === 0) return;
 
     var customerName = nameInput.value.trim();
+    var customerPhone = phoneInput.value.trim();
     var customerNotes = notesInput.value.trim();
-    if(customerName){
-      try{ localStorage.setItem(NAME_STORAGE_KEY, customerName); } catch(e){}
+
+    if(!phoneIsValid(customerPhone)){
+      phoneInput.setAttribute('aria-invalid', 'true');
+      showError('נא להזין מספר טלפון תקין, כדי שנוכל לחזור אליכם');
+      phoneInput.focus();
+      return;
     }
+    showError('');
+    try{
+      if(customerName){ localStorage.setItem(NAME_STORAGE_KEY, customerName); }
+      localStorage.setItem(PHONE_STORAGE_KEY, customerPhone);
+    } catch(e){}
 
     sendBtn.disabled = true;
     sendBtn.textContent = 'שולחים את ההזמנה...';
-    var orderNum = await saveOrderToServer(result, customerName, customerNotes);
+    var saved = await saveOrderToServer(customerName, customerPhone, customerNotes);
+
+    // השרת דחה את ההזמנה (למשל טלפון לא תקין או הזמנה ריקה) - עוצרים ומציגים את הסיבה
+    if(saved && saved.error){
+      showError(saved.error);
+      sendBtn.textContent = sendBtnText;
+      sendBtn.disabled = false;
+      return;
+    }
+    // אם השרת לא ענה בכלל, ממשיכים לוואטסאפ בכל זאת - כדי שההזמנה לא תלך לאיבוד
+    var orderNum = saved ? saved.orderNum : null;
 
     var msgLines = ['היי בורקס עמקה! 😊'];
     if(orderNum){ msgLines.push('מספר הזמנה: ' + orderNum); }
     if(customerName){ msgLines.push('שם המזמין: ' + customerName); }
+    msgLines.push('טלפון: ' + customerPhone);
     msgLines.push('אשמח להזמין מגש חם עם:');
     result.lines.forEach(function(line){
       msgLines.push('• ' + line.qty + ' × ' + line.label);
