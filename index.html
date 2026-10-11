@@ -82,6 +82,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Rubik:wght@600;700;800;900&family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -359,6 +360,7 @@
   }
   .ob-send-btn:hover{filter:brightness(1.08);}
   .ob-send-btn:active{transform:translateY(4px); box-shadow:none;}
+  .ob-turnstile{margin-top:16px; display:flex; justify-content:center; min-height:65px;}
   .ob-error{color:#b3261e; font-size:13.5px; font-weight:600; text-align:center; margin-top:12px;}
   .ob-error:empty{display:none;}
   .ob-input[aria-invalid="true"]{border-color:#b3261e;}
@@ -747,6 +749,9 @@
       🌙 אנחנו סגורים כרגע (פתוח א׳-ה׳ 09:00-21:00). אפשר לשלוח הזמנה - נחזור אליכם כשנפתח.
     </div>
 
+    <!-- בדיקת "אני לא רובוט" של Cloudflare (Turnstile) - לרוב עוברת לבד בלי שהלקוח צריך לעשות כלום -->
+    <div class="ob-turnstile cf-turnstile" data-sitekey="0x4AAAAAAFUAhFUpvt0Fsvn1" data-language="he" data-theme="light" data-size="flexible" data-action="order"></div>
+
     <div id="ob-error" class="ob-error" role="alert"></div>
 
     <button type="button" id="ob-send" class="ob-send-btn" disabled aria-disabled="true">
@@ -901,7 +906,7 @@
       <li>השם, הטלפון והמגש האחרון נשמרים גם בדפדפן שלכם בלבד (localStorage), כדי שלא תצטרכו להקליד אותם שוב. אפשר למחוק אותם בניקוי נתוני האתר בדפדפן.</li>
     </ul>
     <h4>עוגיות ושירותים חיצוניים</h4>
-    <p>האתר לא משתמש בעוגיות מעקב או בפרסום. הגופנים באתר נטענים מ-Google Fonts, ולכן גוגל מקבלת את כתובת ה-IP של המכשיר בעת טעינת הדף.</p>
+    <p>האתר לא משתמש בעוגיות מעקב או בפרסום. הגופנים באתר נטענים מ-Google Fonts, ולכן גוגל מקבלת את כתובת ה-IP של המכשיר בעת טעינת הדף. כדי להגן על טופס ההזמנה מפני בוטים, האתר משתמש בשירות Cloudflare Turnstile, שבודק נתונים טכניים מהדפדפן (כמו כתובת IP) רק לצורך ההבחנה בין אדם לרובוט.</p>
     <h4>הזכויות שלכם</h4>
     <p>אפשר לבקש לעיין במידע שנשמר עליכם, לתקן אותו או למחוק אותו - בטלפון <a href="tel:0549073509">054-9073509</a> או במייל <a href="mailto:office@burekas-amka.co.il" dir="ltr">office@burekas-amka.co.il</a>. הזמנות שהושלמו נמחקות אוטומטית לאחר שנה.</p>
   </div>
@@ -1176,6 +1181,14 @@ function scrollToId(id){
     showError('');
   });
 
+  // הטוקן של בדיקת Turnstile (אם הספריה לא נטענה - מחרוזת ריקה, והאתר עדיין ממשיך לוואטסאפ)
+  function getTurnstileToken(){
+    try{ return (window.turnstile && window.turnstile.getResponse()) || ''; } catch(e){ return ''; }
+  }
+  function resetTurnstile(){
+    try{ if(window.turnstile){ window.turnstile.reset(); } } catch(e){}
+  }
+
   // שמירת ההזמנה בשרת (לוח הניהול + מייל). השרת מחשב את המחיר בעצמו - שולחים רק כמויות.
   // מחזיר { orderNum } בהצלחה, { error } אם השרת דחה את ההזמנה, או null אם לא הייתה תשובה.
   async function saveOrderToServer(customerName, customerPhone, customerNotes){
@@ -1189,7 +1202,7 @@ function scrollToId(id){
       var res = await fetch(API_URL + '/api/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: items, name: customerName, phone: customerPhone, notes: customerNotes }),
+        body: JSON.stringify({ items: items, name: customerName, phone: customerPhone, notes: customerNotes, turnstileToken: getTurnstileToken() }),
         signal: controller.signal
       });
       var data = await res.json().catch(function(){ return {}; });
@@ -1227,6 +1240,7 @@ function scrollToId(id){
     sendBtn.disabled = true;
     sendBtn.textContent = 'שולחים את ההזמנה...';
     var saved = await saveOrderToServer(customerName, customerPhone, customerNotes);
+    resetTurnstile(); // כל טוקן תקף לשימוש אחד בלבד
 
     // השרת דחה את ההזמנה (למשל טלפון לא תקין או הזמנה ריקה) - עוצרים ומציגים את הסיבה
     if(saved && saved.error){
