@@ -7,8 +7,8 @@
 <meta name="robots" content="noindex, nofollow">
 <title>מלאי · בורקס עמקה</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥐</text></svg>">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="stock.webmanifest">
+<link rel="apple-touch-icon" href="images/stock-icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Secular+One&display=swap" rel="stylesheet">
@@ -1025,7 +1025,8 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;if(view==='settings')render()});
 addEventListener('appinstalled',()=>{deferredInstall=null;toast('האפליקציה הותקנה')});
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
+  // scope מוגבל לאפליקציית המלאי בלבד - שלא ישפיע על האתר של הלקוחות
+  navigator.serviceWorker.register('stock-sw.js',{scope:'./panel-x7k2-stock'}).catch(()=>{});
 }
 
 /* ---------- הפעלה ---------- */
