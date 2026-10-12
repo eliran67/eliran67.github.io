@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2B332E">
+<meta name="robots" content="noindex, nofollow">
+<title>מלאי · בורקס עמקה</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥐</text></svg>">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Secular+One&display=swap" rel="stylesheet">
+<style>
+:root{
+  --page:#ECEEE9; --surface:#FFFFFF; --ink:#1E2621; --muted:#66706A; --line:#D9DDD6;
+  --crust:#C08A1C; --crust-soft:#F5E7C6; --nigella:#2B332E;
+  --low:#B23A22; --low-soft:#F8E1DB; --ok:#3D7A4C;
+  --r-sm:8px; --r-lg:16px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --page:#161A17; --surface:#212622; --ink:#EDEFEA; --muted:#9AA39D; --line:#343B36;
+    --crust:#E0AC3E; --crust-soft:#3A3120; --nigella:#0F1210;
+    --low:#EE7A60; --low-soft:#3E2621; --ok:#7CC08D;
+  }
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{
+  background:var(--page); color:var(--ink);
+  font-family:'Assistant',system-ui,'Segoe UI',Arial,sans-serif; font-size:17px; line-height:1.45;
+  padding-bottom:calc(76px + env(safe-area-inset-bottom,0px));
+  -webkit-tap-highlight-color:transparent;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--crust);outline-offset:2px}
+
+/* כותרת */
+header{
+  position:sticky;top:0;z-index:20;background:var(--nigella);color:#F3F1EA;
+  padding:calc(12px + env(safe-area-inset-top,0px)) 16px 12px;
+  display:flex;align-items:center;gap:10px;
+}
+header h1{font-family:'Secular One','Assistant',sans-serif;font-weight:400;font-size:1.35rem;margin:0;flex:1;letter-spacing:.2px}
+header h1 small{display:block;font-family:'Assistant',sans-serif;font-size:.8rem;opacity:.7}
+.sync{border:1px solid rgba(255,255,255,.25);background:transparent;color:inherit;border-radius:99px;padding:5px 12px;font-size:.85rem;display:flex;align-items:center;gap:6px}
+.sync i{width:8px;height:8px;border-radius:50%;background:#888;display:inline-block}
+.sync.ok i{background:#7CC08D}.sync.busy i{background:#E0AC3E}.sync.err i{background:#EE7A60}
+.icon-btn{background:transparent;border:0;color:inherit;font-size:1.3rem;padding:6px;border-radius:var(--r-sm)}
+
+main{max-width:720px;margin:0 auto;padding:14px 14px 24px}
+
+/* כפתורי בחירה */
+.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:4px;gap:4px;margin-bottom:12px}
+.seg button{flex:1;border:0;background:transparent;padding:8px 4px;font-size:.95rem;white-space:nowrap;border-radius:99px;font-weight:600;color:var(--muted)}
+.seg button.on{background:var(--ink);color:var(--surface)}
+
+.summary{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.pill{background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-size:.9rem;color:var(--muted)}
+.pill b{color:var(--ink)}
+.pill.alert{background:var(--low-soft);border-color:transparent;color:var(--low)}
+.pill.alert b{color:var(--low)}
+
+.search{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);margin-bottom:12px}
+
+/* פריטים */
+.group-title{font-family:'Secular One','Assistant',sans-serif;font-weight:400;font-size:1.05rem;margin:18px 2px 8px;color:var(--muted)}
+.item{
+  display:flex;align-items:center;gap:12px;background:var(--surface);
+  border-radius:var(--r-lg);padding:12px 14px;margin-bottom:8px;border:1px solid var(--line);
+}
+.item.low{border-color:var(--low);box-shadow:inset -4px 0 0 var(--low)}
+.item .info{flex:1;min-width:0;background:none;border:0;text-align:right;padding:0}
+.item .name{font-weight:700;font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .meta{font-size:.85rem;color:var(--muted)}
+.item.low .meta{color:var(--low);font-weight:600}
+.gauge{height:6px;background:var(--crust-soft);border-radius:99px;margin-top:7px;overflow:hidden}
+.gauge span{display:block;height:100%;background:var(--crust);border-radius:99px;transition:width .25s}
+.item.low .gauge{background:var(--low-soft)}.item.low .gauge span{background:var(--low)}
+.qty-ctl{display:flex;align-items:center;gap:4px}
+.qty-col{display:flex;flex-direction:column;align-items:center;gap:6px}
+.pack-btn{border:1px solid var(--crust);background:var(--crust-soft);color:var(--ink);border-radius:99px;padding:4px 12px;font-size:.85rem;font-weight:700;white-space:nowrap}
+.switch-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.switch-row input{width:22px;height:22px;accent-color:var(--crust)}
+.step{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--page);font-size:1.3rem;line-height:1;display:grid;place-items:center}
+.qty{min-width:64px;border:0;background:none;text-align:center;padding:2px 4px;font-family:'Secular One','Assistant',sans-serif;font-size:1.5rem;line-height:1.1}
+.qty small{display:block;font-family:'Assistant',sans-serif;font-size:.75rem;color:var(--muted)}
+
+.empty{text-align:center;padding:36px 16px;color:var(--muted)}
+.empty p{margin:0 0 14px}
+
+/* כפתורים */
+.btn{border:0;border-radius:var(--r-sm);padding:11px 18px;font-weight:700;background:var(--ink);color:var(--surface)}
+.btn.gold{background:var(--crust);color:#1E1A10}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn.danger{background:transparent;border:1px solid var(--low);color:var(--low)}
+.btn.block{width:100%}
+.fab{position:fixed;left:18px;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:15;
+  width:58px;height:58px;border-radius:50%;border:0;background:var(--crust);color:#1E1A10;font-size:2rem;line-height:1;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+
+/* פאנלים */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;margin-bottom:12px}
+.panel h2{font-family:'Secular One','Assistant',sans-serif;font-weight:400;font-size:1.2rem;margin:0 0 10px}
+.panel p.note{color:var(--muted);font-size:.9rem;margin:6px 0 0}
+label.f{display:block;font-weight:600;font-size:.9rem;margin:12px 0 4px}
+.in{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--page)}
+.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+
+
+.shop li{padding:9px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
+.shop{list-style:none;margin:0;padding:0}
+.shop li span:last-child{font-weight:700;white-space:nowrap}
+
+.log-day{font-weight:700;color:var(--muted);margin:16px 2px 6px;font-size:.9rem}
+.log-row{display:flex;gap:10px;align-items:baseline;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:9px 12px;margin-bottom:6px}
+.log-row .t{color:var(--muted);font-size:.85rem;min-width:42px}
+.log-row .n{flex:1;min-width:0}
+.log-row .n small{display:block;color:var(--muted)}
+.log-row .d{font-weight:700;white-space:nowrap}
+.d.plus{color:var(--ok)}.d.minus{color:var(--low)}
+
+/* תפריט תחתון */
+nav.bottom{position:fixed;bottom:0;left:0;right:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);
+  display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+nav.bottom button{flex:1;border:0;background:none;padding:6px 2px;font-size:.8rem;color:var(--muted);font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;border-radius:var(--r-sm);position:relative}
+nav.bottom button b{font-size:1.35rem;font-weight:400;line-height:1}
+nav.bottom button.on{color:var(--ink)}
+nav.bottom button.on::after{content:"";position:absolute;top:0;width:28px;height:3px;border-radius:3px;background:var(--crust)}
+.badge{position:absolute;top:2px;left:calc(50% - 22px);background:var(--low);color:#fff;border-radius:99px;font-size:.7rem;padding:0 6px;min-width:18px}
+
+/* חלון */
+dialog{border:0;border-radius:var(--r-lg);padding:0;width:min(520px,94vw);max-height:90vh;background:var(--surface);color:var(--ink)}
+dialog::backdrop{background:rgba(15,18,16,.55)}
+.dlg{padding:18px 18px 20px;overflow:auto;max-height:90vh}
+.dlg h3{font-family:'Secular One','Assistant',sans-serif;font-weight:400;font-size:1.3rem;margin:0 0 4px}
+.dlg .sub{color:var(--muted);margin:0 0 8px}
+.x{border:0;background:none;font-size:1.3rem;color:var(--muted);padding:4px 8px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--surface);padding:10px 18px;border-radius:99px;z-index:50;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+
+/* תוספות גרסה 2 */
+.item .meta .bad{color:var(--low);font-weight:700}
+.item.exp{border-color:var(--crust);box-shadow:inset -4px 0 0 var(--crust)}
+.pill.warn{background:var(--crust-soft);border-color:transparent;color:var(--ink)}
+.sup-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.sup-row small{display:block;color:var(--muted)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:12px 14px}
+.stat b{display:block;font-family:'Secular One','Assistant',sans-serif;font-weight:400;font-size:1.45rem;line-height:1.2}
+.stat span{color:var(--muted);font-size:.85rem}
+.shop li small{color:var(--muted)}
+.linkish{background:none;border:0;color:var(--crust);font-weight:700;padding:0;text-decoration:underline}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>בורקס עמקה<small>ניהול מלאי</small></h1>
+  <a class="sync" href="panel-x7k2.html" title="מעבר ללוח ההזמנות" style="text-decoration:none">הזמנות</a>
+  <button class="sync" id="syncBtn" title="סנכרון עם הענן"><i></i><span id="syncTxt">מקומי</span></button>
+  <button class="icon-btn" id="settingsBtn" aria-label="הגדרות">⚙︎</button>
+</header>
+
+<main id="app"></main>
+
+<button class="fab" id="fab" aria-label="הוספת פריט">+</button>
+
+<nav class="bottom" id="nav">
+  <button data-view="stock"><b>▦</b>מלאי</button>
+  <button data-view="shop"><b>☰</b>הזמנות<span class="badge" id="shopBadge" hidden></span></button>
+  <button data-view="log"><b>↺</b>יומן</button>
+</nav>
+
+<dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
+<div class="toast" id="toast"></div>
+<input type="file" id="importFile" accept="application/json" hidden>
+
+<script>
+'use strict';
+const LS_DATA='amka_inv_data_v1', LS_CFG='amka_inv_cfg_v1', LS_PENDING='amka_inv_pending_v1';
+// הנתונים נשמרים בשרת של בורקס עמקה (Cloudflare), עם אותה כניסה של לוח הבקרה
+const API_URL='https://borekas-backend.eliran67.workers.dev';
+const TOKEN_KEY='borekas_admin_token';   // אותו מפתח כמו בלוח הבקרה - התחברות באחד מחברת גם את השני
+const SERVER_ID='server';                // מזהה נקודת המוצא לסנכרון (במקום Bin ID)
+let remoteVersion=0;                     // הגרסה בשרת שהמכשיר ראה לאחרונה
+const UNITS=['יח׳','ק״ג','גרם','ליטר','מגש','קרטון','חבילה','גליל','סט','צנצנת','פחית'];
+const TYPES=['product','raw','pack'];
+const TYPE_LABEL={product:'מוצרים מוכנים',raw:'חומרי גלם',pack:'אריזה וכלים'};
+const TYPE_SHORT={product:'מוצרים',raw:'חומרי גלם',pack:'אריזה',all:'הכל'};
+const DEFAULTS_V=3;
+const REMOVED_RAWS=['בצק עלים','גבינה בולגרית','תפוחי אדמה','פטריות','תרד','שומשום'];
+const DEFAULT_ITEMS=[
+  ['product','בורקס גבינה','יח׳'],['product','בורקס תפוחי אדמה','יח׳'],['product','בורקס פטריות','יח׳'],['product','בורקס תרד','יח׳'],
+  ['raw','ביצים','יח׳'],['raw','מלפפון חמוץ','צנצנת'],
+  ['pack','צלחות','יח׳'],['pack','נייר פרגמנט','גליל'],['pack','כוסיות לרסק','יח׳'],['pack','כוסיות לחריף','יח׳'],['pack','סכו״ם','סט']
+];
+const RATE_DAYS=14;            // חלון הימים לחישוב קצב הצריכה
+const EXP_WARN_DAYS=2;         // כמה ימים לפני התוקף להתריע
+const NOT_CONSUMPTION=['תיקון'];
+
+let S=normalize(null);  // נטען מ-IndexedDB באתחול (boot)
+let booted=false;       // עד שהנתונים נטענו: אין סנכרון, אין שמירה ואין לחיצות
+let view='stock', filter='product', query='';
+let pushTimer=null, syncState='local';
+let rates={};
+let deferredInstall=null;
+const LS_UI='amka_inv_ui_v1';
+let ui=Object.assign({simple:true},loadJSON(LS_UI,{})); // מצב פשוט: מסתיר מחיר, תוקף, ספק והערות (ברירת מחדל: פעיל)
+
+/* ---------- כלי עזר ---------- */
+function loadJSON(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def}catch(e){return def}}
+function saveJSON(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
+
+/* ---------- IndexedDB: אחסון הנתונים הראשיים (S) ----------
+   localStorage מוגבל לכ-5MB ועובד באופן סינכרוני; IndexedDB מחזיק הרבה יותר.
+   ההגדרות הקטנות (LS_CFG, LS_UI, LS_BASE, LS_PENDING) נשארות ב-localStorage. */
+const DB_NAME='amka_inv', DB_STORE='kv', DB_KEY='data';
+let dbPromise=null;
+function initDB(){
+  if(dbPromise) return dbPromise;
+  dbPromise=new Promise((resolve,reject)=>{
+    if(!('indexedDB' in self)) return reject(new Error('IndexedDB לא נתמך'));
+    const req=indexedDB.open(DB_NAME,1);
+    req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(DB_STORE))db.createObjectStore(DB_STORE)};
+    req.onsuccess=()=>{const db=req.result;db.onversionchange=()=>db.close();resolve(db)};
+    req.onerror=()=>reject(req.error);
+    req.onblocked=()=>reject(new Error('IndexedDB חסום על ידי לשונית אחרת'));
+  });
+  dbPromise.catch(()=>{dbPromise=null}); // כישלון לא נשמר במטמון – ננסה שוב בפעם הבאה
+  return dbPromise;
+}
+function idbRequest(mode,fn){
+  return initDB().then(db=>new Promise((resolve,reject)=>{
+    const tx=db.transaction(DB_STORE,mode), req=fn(tx.objectStore(DB_STORE));
+    tx.oncomplete=()=>resolve(req.result);              // מחכים לסיום הטרנזקציה, לא רק לבקשה – אז הנתונים באמת נכתבו
+    tx.onerror=tx.onabort=()=>reject(tx.error||req.error);
+  }));
+}
+let idbOK=true;         // false = הדפדפן חוסם IndexedDB (למשל גלישה פרטית ישנה) → נופלים ל-localStorage
+async function loadDataDB(){
+  try{
+    let d=await idbRequest('readonly',st=>st.get(DB_KEY));
+    if(d==null){
+      // הסבה חד-פעמית: נתונים ישנים מ-localStorage עוברים ל-IndexedDB ונמחקים משם רק אחרי שנכתבו
+      const old=loadJSON(LS_DATA,null);
+      if(old){await idbRequest('readwrite',st=>st.put(old,DB_KEY));try{localStorage.removeItem(LS_DATA)}catch(_){}}
+      d=old;
+    }
+    return normalize(d);
+  }catch(e){
+    idbOK=false; console.warn('IndexedDB unavailable, using localStorage',e);
+    return normalize(loadJSON(LS_DATA,null));
+  }
+}
+let saveChain=Promise.resolve();
+function saveDataDB(st){
+  // שמירות נכנסות לתור, כדי ששמירה ישנה לעולם לא תסתיים אחרי חדשה ותדרוס אותה
+  const run=async()=>{
+    if(idbOK){
+      try{await idbRequest('readwrite',store=>store.put(st,DB_KEY));return true}
+      catch(e){if(e&&e.name==='QuotaExceededError') return false; idbOK=false}
+    }
+    return saveJSON(LS_DATA,st);
+  };
+  const p=saveChain.then(run,run);
+  saveChain=p.catch(()=>{});
+  return p;
+}
+async function persist(){
+  if(!(await saveDataDB(S))) toast('האחסון במכשיר מלא – השינוי לא נשמר במכשיר');
+}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function r2(n){return Math.round((+n||0)*100)/100}
+function fmt(n){return r2(n).toLocaleString('he-IL',{maximumFractionDigits:2})}
+function money(n){return '₪'+(Math.round(n)||0).toLocaleString('he-IL')}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function $(s,r=document){return r.querySelector(s)}
+function byId(id){return S.items.find(i=>i.id===id)}
+function supById(id){return S.suppliers.find(s=>s.id===id)}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2400)}
+function today0(){const d=new Date();d.setHours(0,0,0,0);return d}
+function daysUntil(dateStr){if(!dateStr)return null;return Math.round((new Date(dateStr+'T00:00:00')-today0())/864e5)}
+function waNum(p){let d=String(p||'').replace(/\D/g,'');if(d.startsWith('0'))d='972'+d.slice(1);return d}
+
+/* ---------- לוגיקת מלאי ---------- */
+function isLow(it){return (+it.min||0)>0 && it.qty<=it.min}
+function expDays(it){return !ui.simple&&it.qty>0?daysUntil(it.exp):null}
+function isExpiring(it){const d=expDays(it);return d!==null&&d<=EXP_WARN_DAYS}
+function coverFor(it){const s=supById(it.supplierId);return +(s&&s.coverDays)||S.coverDays||3}
+
+function daysLeft(it){const r=rates[it.id];return r?it.qty/r:null}
+function needsOrder(it){
+  if(isLow(it)) return true;
+  const d=daysLeft(it); return d!==null && d<=coverFor(it);
+}
+function roundUnit(it,n){
+  if(n<=0) return 0;
+  if(it.unit==='ק״ג'||it.unit==='ליטר') return Math.ceil(n*2)/2;
+  if(it.unit==='גרם') return Math.ceil(n/50)*50;
+  return Math.ceil(n);
+}
+function suggest(it){
+  const min=+it.min||0, r=rates[it.id];
+  const need=r? r*coverFor(it)+min-it.qty : Math.max(min*2-it.qty,0);
+  return roundUnit(it,need);
+}
+
+function applyDelta(it,delta,reason,note,extra){
+  const before=it.qty;
+  it.qty=Math.max(0,r2(before+delta));
+  if(it.qty===0) it.exp='';
+  const e={id:uid(),ts:Date.now(),itemId:it.id,name:it.name,unit:it.unit,delta:r2(it.qty-before),after:it.qty,reason,note:note||'',...(extra||{})};
+  S.log.push(e); return e;
+}
+
+/* ---------- תצוגה ---------- */
+function updateBadge(){
+  const n=S.items.filter(needsOrder).length, badge=$('#shopBadge');
+  badge.hidden=!n; badge.textContent=n;
+}
+/* עדכון נקודתי של שורת פריט אחת (במקום render מלא) אחרי +/−/קרטון.
+   מחליף רק את השורה – כך גם הצבע, השורה "מינימום" והפס מתעדכנים יחד –
+   ואת שורת הסיכום והתג בתפריט. השורה לא זזה ממקומה ברשימה, כדי שלא "תברח" מתחת לאצבע. */
+function patchItemRow(it,act){
+  const row=document.querySelector(`.item[data-id="${CSS.escape(it.id)}"]`);
+  if(!row){render();return}
+  computeRates();
+  const tpl=document.createElement('template'); tpl.innerHTML=itemRow(it).trim();
+  const fresh=tpl.content.firstElementChild;
+  row.replaceWith(fresh);
+  const btn=fresh.querySelector(`[data-act="${act}"]`)||fresh.querySelector('[data-act="inc"]');
+  if(btn&&document.activeElement===document.body) btn.focus({preventScroll:true}); // נגישות: הפוקוס נשאר על אותו כפתור
+  const sum=$('#stockSummary'); if(sum) sum.innerHTML=stockSummary(visibleItems());
+  updateBadge();
+}
+function render(){
+  computeRates();
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.view===view));
+  $('#fab').hidden=view!=='stock';
+  updateBadge();
+  const app=$('#app');
+  // שומרים פוקוס ומיקום סמן בשדה החיפוש, כי innerHTML יוצר את השדה מחדש
+  const sEl=document.activeElement&&document.activeElement.id==='search'?document.activeElement:null;
+  const sPos=sEl?[sEl.selectionStart,sEl.selectionEnd]:null;
+  app.innerHTML=({stock:renderStock,shop:renderShop,log:renderLog,settings:renderSettings}[view]||renderStock)();
+  if(sPos){const n=$('#search');if(n){n.focus();try{n.setSelectionRange(sPos[0],sPos[1])}catch(_){}}}
+}
+function safeRender(){render()}
+
+function visibleItems(){return S.items.filter(i=>(filter==='all'||i.type===filter)&&(!query||i.name.includes(query)))}
+function stockSummary(list){
+  const low=list.filter(isLow).length, exp=list.filter(isExpiring).length;
+  const value=list.reduce((s,i)=>s+(+i.price||0)*i.qty,0);
+  return `<span class="pill"><b>${list.length}</b> פריטים</span>
+    ${low?`<span class="pill alert"><b>${low}</b> מתחת למינימום</span>`:''}
+    ${exp?`<span class="pill warn"><b>${exp}</b> לפני תפוגה</span>`:''}
+    ${value&&!ui.simple?`<span class="pill">שווי <b>${money(value)}</b></span>`:''}`;
+}
+function renderStock(){
+  if(!S.items.length){
+    return `<div class="empty"><p>המלאי עדיין ריק.<br>אפשר להוסיף פריטים אחד-אחד, או לטעון את הרשימה הבסיסית ולערוך אותה.</p>
+      <div class="btns" style="justify-content:center"><button class="btn gold" data-act="new">הוספת פריט</button><button class="btn ghost" data-act="seed">טעינת הרשימה הבסיסית</button></div></div>`;
+  }
+  const list=visibleItems();
+  let h=`<div class="seg" role="tablist">
+    ${['product','raw','pack','all'].map(f=>`<button data-filter="${f}" class="${filter===f?'on':''}">${TYPE_SHORT[f]}</button>`).join('')}
+  </div>
+  <div class="summary" id="stockSummary">${stockSummary(list)}</div>
+  <input class="search" id="search" type="search" placeholder="חיפוש פריט…" value="${esc(query)}">`;
+  const groups=filter==='all'?TYPES:[filter];
+  groups.forEach(g=>{
+    const items=list.filter(i=>i.type===g).sort((a,b)=>(isLow(b)-isLow(a))||(isExpiring(b)-isExpiring(a))||a.name.localeCompare(b.name,'he'));
+    if(filter==='all') h+=`<div class="group-title">${TYPE_LABEL[g]}</div>`;
+    if(!items.length){h+=`<div class="empty"><p>${query?'לא נמצאו פריטים':'אין פריטים בקטגוריה הזו'}</p></div>`;return}
+    h+=items.map(itemRow).join('');
+  });
+  return h;
+}
+function itemRow(it){
+  const low=isLow(it), min=+it.min||0, ed=expDays(it), dl=daysLeft(it);
+  const pct=min>0?Math.min(100,it.qty/(min*2)*100):(it.qty>0?100:0);
+  const parts=[];
+  if(low) parts.push(`<span class="bad">חסר · מינימום ${fmt(min)}</span>`);
+  else if(min) parts.push(`מינימום ${fmt(min)}`);
+  if(dl!==null&&it.qty>0) parts.push(dl<1?'ייגמר היום':dl<2?'מספיק ליום בערך':`מספיק לכ-${Math.floor(dl)} ימים`);
+  if(ed!==null) parts.push(ed<0?'<span class="bad">פג תוקף</span>':ed===0?'<span class="bad">תוקף היום</span>':ed===1?'<span class="bad">תוקף מחר</span>':ed<=EXP_WARN_DAYS?`<span class="bad">תוקף בעוד ${ed} ימים</span>`:`תוקף ${new Date(it.exp).toLocaleDateString('he-IL',{day:'numeric',month:'numeric'})}`);
+  if(!parts.length) parts.push('ללא מינימום');
+  return `<div class="item ${low?'low':isExpiring(it)?'exp':''}" data-id="${it.id}">
+    <button class="info" data-act="edit"><div class="name">${esc(it.name)}</div><div class="meta">${parts.join(' · ')}</div><div class="gauge"><span style="width:${pct}%"></span></div></button>
+    <div class="qty-col"><div class="qty-ctl">
+      <button class="step" data-act="inc" aria-label="הוספת 1">+</button>
+      <button class="qty" data-act="adjust" aria-label="עדכון כמות">${fmt(it.qty)}<small>${esc(it.unit)}</small></button>
+      <button class="step" data-act="dec" aria-label="הורדת 1">−</button>
+    </div>${+it.pack>1?`<button class="pack-btn" data-act="incPack">+ קרטון (${fmt(it.pack)})</button>`:''}</div></div>`;
+}
+
+/* ----- הזמנות לפי ספק ----- */
+function orderGroups(){
+  const items=S.items.filter(needsOrder).map(it=>({it,q:suggest(it)})).filter(x=>x.q>0||isLow(x.it));
+  const groups=[];
+  S.suppliers.forEach(s=>{const g=items.filter(x=>x.it.supplierId===s.id);if(g.length)groups.push({sup:s,items:g})});
+  const rest=items.filter(x=>!supById(x.it.supplierId));
+  if(rest.length) groups.push({sup:null,items:rest});
+  return groups;
+}
+function orderText(g){
+  const lines=g.items.map(x=>`• ${x.it.name}: ${fmt(x.q||(+x.it.min||1))} ${x.it.unit}`).join('\n');
+  return g.sup?`שלום ${g.sup.name},\nהזמנה לבורקס עמקה:\n${lines}\nתודה!`:`רשימת קניות – בורקס עמקה\n${new Date().toLocaleDateString('he-IL')}\n${lines}`;
+}
+function renderShop(){
+  const groups=orderGroups();
+  if(!groups.length) return `<div class="empty"><p>אין כרגע מה להזמין. 👌<br>פריט יופיע כאן כשהוא יורד למינימום, או כשלפי קצב הצריכה הוא ייגמר לפני המשלוח הבא.</p></div>
+    ${S.suppliers.length||ui.simple?'':`<div class="panel"><h2>ספקים</h2><p class="note" style="margin-top:0">הוסף ספקים כדי שההזמנה תתחלק לפי ספק ותישלח ישר לוואטסאפ שלו.</p><div class="btns"><button class="btn ghost" data-act="supNew">הוספת ספק</button></div></div>`}`;
+  let h='';
+  groups.forEach((g,gi)=>{
+    h+=`<div class="panel"><h2>${g.sup?esc(g.sup.name):'ללא ספק'}</h2><ul class="shop">${g.items.map(({it,q})=>{
+      const dl=daysLeft(it);
+      const why=isLow(it)?`יש ${fmt(it.qty)}`:`יש ${fmt(it.qty)} · ייגמר בעוד ~${Math.max(0,Math.floor(dl))} ימים`;
+      return `<li><span>${esc(it.name)} <small>(${why})</small></span><span>${q?fmt(q)+' '+esc(it.unit):'—'}</span></li>`}).join('')}</ul>
+      <div class="btns"><button class="btn gold" data-act="waOrder" data-g="${gi}">${g.sup&&g.sup.phone?'הזמנה בוואטסאפ':'שליחה בוואטסאפ'}</button><button class="btn ghost" data-act="copyOrder" data-g="${gi}">העתקה</button></div></div>`;
+  });
+  h+=`<p class="note" style="color:var(--muted);font-size:.85rem;padding:0 4px">הכמות מחושבת לפי קצב הצריכה ב-${RATE_DAYS} הימים האחרונים, כך שיספיק עד המשלוח הבא ועוד המינימום. לפריט בלי מספיק היסטוריה – השלמה לפעמיים המינימום.</p>`;
+  return h;
+}
+
+/* ----- יומן וסטטיסטיקה ----- */
+function renderLog(){
+  const m0=new Date();m0.setDate(1);m0.setHours(0,0,0,0);
+  const spend=S.log.filter(e=>e.ts>=m0&&e.cost).reduce((s,e)=>s+e.cost,0);
+  const value=S.items.reduce((s,i)=>s+(+i.price||0)*i.qty,0);
+  const w0=Date.now()-7*864e5, sold={};
+  S.log.forEach(e=>{const it=byId(e.itemId);if(it&&it.type==='product'&&e.ts>=w0&&e.delta<0&&!NOT_CONSUMPTION.includes(e.reason))sold[it.id]=(sold[it.id]||0)-e.delta});
+  const top=Object.entries(sold).sort((a,b)=>b[1]-a[1]);
+  let h=ui.simple?'':`<div class="stats"><div class="stat"><b>${money(spend)}</b><span>קניות סחורה החודש</span></div><div class="stat"><b>${money(value)}</b><span>שווי המלאי כרגע</span></div></div>`;
+  if(top.length) h+=`<div class="panel"><h2>יצא ב-7 הימים האחרונים</h2><ul class="shop">${top.map(([id,n])=>`<li><span>${esc(byId(id).name)}</span><span>${fmt(n)} ${esc(byId(id).unit)}</span></li>`).join('')}</ul></div>`;
+  if(!S.log.length) return h+`<div class="empty"><p>עוד אין תנועות. כל שינוי במלאי יירשם כאן.</p></div>`;
+  const rows=S.log.slice(-300).reverse(); let day='';
+  rows.forEach(e=>{
+    const d=new Date(e.ts), ds=d.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'numeric'});
+    if(ds!==day){day=ds;h+=`<div class="log-day">${ds}</div>`}
+    const cls=e.delta>0?'plus':e.delta<0?'minus':'';
+    h+=`<div class="log-row"><span class="t">${d.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}</span>
+      <span class="n">${esc(e.name)}<small>${esc(e.reason)}${e.cost?' · '+money(e.cost):''}${e.note?' · '+esc(e.note):''}</small></span>
+      <span class="d ${cls}"><bdi dir="ltr">${e.delta>0?'+':''}${fmt(e.delta)}</bdi> ${esc(e.unit||'')}</span></div>`;
+  });
+  return h;
+}
+
+/* ---------- חלונות ---------- */
+const dlg=$('#dlg');
+function openDlg(html){$('#dlgBody').innerHTML=html;if(!dlg.open)dlg.showModal()}
+function closeDlg(){dlg.close()}
+dlg.addEventListener('click',e=>{if(e.target===dlg)closeDlg()});
+
+function editItem(id,type){
+  const t0=type||(filter==='all'?'product':filter);
+  const it=id?byId(id):{id:'',type:t0,name:'',unit:t0==='raw'?'ק״ג':'יח׳',qty:0,min:0,notes:'',price:'',supplierId:'',exp:''};
+  const units=UNITS.includes(it.unit)?UNITS:[it.unit,...UNITS];
+  const r=id?rates[id]:null;
+  openDlg(`<h3>${id?'עריכת פריט':'פריט חדש'}</h3>
+    ${r?`<p class="sub">צריכה ממוצעת: ${fmt(r)} ${esc(it.unit)} ליום</p>`:''}
+    <div class="seg" id="tSeg" style="margin-top:10px">${TYPES.map(t=>`<button type="button" data-t="${t}" class="${it.type===t?'on':''}">${{product:'מוצר מוכן',raw:'חומר גלם',pack:'אריזה'}[t]}</button>`).join('')}</div>
+    <label class="f" for="fName">שם</label><input class="in" id="fName" value="${esc(it.name)}" placeholder="למשל: בורקס גבינה">
+    <div class="row">
+      <div><label class="f" for="fUnit">יחידה</label><select class="in" id="fUnit">${units.map(u=>`<option ${u===it.unit?'selected':''}>${esc(u)}</option>`).join('')}</select></div>
+      <div><label class="f" for="fMin">מינימום להתראה</label><input class="in" id="fMin" type="number" inputmode="decimal" min="0" step="any" value="${it.min||0}"></div>
+    </div>
+    <label class="f" for="fPack">כמות בקרטון (לא חובה)</label><input class="in" id="fPack" type="number" inputmode="decimal" min="0" step="any" value="${it.pack||''}" placeholder="למשל: 50 – יופיע כפתור &quot;+ קרטון&quot;">
+    ${ui.simple?'':`<div class="row">
+      <div><label class="f" for="fPrice">מחיר קנייה ליחידה (₪)</label><input class="in" id="fPrice" type="number" inputmode="decimal" min="0" step="any" value="${it.price||''}"></div>
+      <div><label class="f" for="fExp">תוקף</label><input class="in" id="fExp" type="date" value="${esc(it.exp||'')}"></div>
+    </div>
+    <label class="f" for="fSup">ספק</label>
+    ${S.suppliers.length?`<select class="in" id="fSup"><option value="">ללא ספק</option>${S.suppliers.map(s=>`<option value="${s.id}" ${s.id===it.supplierId?'selected':''}>${esc(s.name)}</option>`).join('')}</select>`
+      :`<p class="note" style="margin:0">עוד אין ספקים. <button type="button" class="linkish" data-act="gotoSettings">הוספת ספק בהגדרות</button></p>`}`}
+    ${id?'':`<label class="f" for="fQty">כמות התחלתית</label><input class="in" id="fQty" type="number" inputmode="decimal" min="0" step="any" value="0">`}
+    ${ui.simple?'':`<label class="f" for="fNotes">הערות</label><textarea class="in" id="fNotes" rows="2">${esc(it.notes||'')}</textarea>`}
+    <div class="btns"><button class="btn gold" id="fSave">שמירה</button><button class="btn ghost" data-act="closeDlg">ביטול</button>${id?'<button class="btn danger" id="fDel">מחיקה</button>':''}</div>`);
+  let curType=it.type;
+  $('#tSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;curType=b.dataset.t;
+    $('#tSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
+  if(id) $('#fDel').onclick=()=>{
+    if(!confirm(`למחוק את "${it.name}"?`))return;
+    S.items=S.items.filter(x=>x.id!==id);tombstone(id);
+    closeDlg();commit();toast('הפריט נמחק');
+  };
+  $('#fSave').onclick=()=>{
+    const name=$('#fName').value.trim(); if(!name){$('#fName').focus();toast('צריך שם לפריט');return}
+    // שדות שמוסתרים במצב פשוט שומרים על הערך הקיים
+    const keep=(sel,cur,fn)=>{const el=$(sel);return el?fn(el.value):cur};
+    const data={name,type:curType,unit:$('#fUnit').value,min:r2($('#fMin').value),pack:$('#fPack').value===''?'':r2($('#fPack').value),
+      notes:keep('#fNotes',it.notes||'',v=>v.trim()),price:keep('#fPrice',it.price??'',v=>v===''?'':r2(v)),
+      exp:keep('#fExp',it.exp||'',v=>v),supplierId:keep('#fSup',it.supplierId||'',v=>v)};
+    if(id){
+      const cur=byId(id); // הסנכרון עלול להחליף את האובייקטים בזמן שהחלון פתוח – מאתרים מחדש לפי מזהה
+      if(!cur){closeDlg();toast('הפריט נמחק במכשיר אחר');return}
+      Object.assign(cur,data);touch(cur);
+    }
+    else{
+      const n=touch({id:uid(),qty:0,...data});S.items.push(n);
+      const q=r2($('#fQty').value); if(q>0) applyDelta(n,q,'כמות התחלתית','');
+      if(q>0&&data.exp) n.exp=data.exp;
+      filter=filter==='all'?'all':curType;
+    }
+    closeDlg();commit();toast(id?'השינויים נשמרו':'הפריט נוסף');
+  };
+  if(!id) $('#fName').focus(); // מיד, לא בטיימר – טיימר יכול לגנוב פוקוס משדה שהמשתמש כבר התחיל להקליד בו
+}
+
+function editSupplier(sid){
+  const s=sid?supById(sid):{id:'',name:'',phone:'',coverDays:''};
+  openDlg(`<h3>${sid?'עריכת ספק':'ספק חדש'}</h3>
+    <label class="f" for="sName">שם</label><input class="in" id="sName" value="${esc(s.name)}" placeholder="למשל: מאפיית השוק">
+    <label class="f" for="sPhone">טלפון לוואטסאפ</label><input class="in" id="sPhone" type="tel" dir="ltr" value="${esc(s.phone)}" placeholder="050-0000000">
+    <label class="f" for="sDays">משלוח כל כמה ימים (לא חובה)</label><input class="in" id="sDays" type="number" inputmode="numeric" min="1" step="1" value="${s.coverDays||''}" placeholder="ברירת מחדל: ${S.coverDays}">
+    <div class="btns"><button class="btn gold" id="sSave">שמירה</button><button class="btn ghost" data-act="closeDlg">ביטול</button>${sid?'<button class="btn danger" id="sDel">מחיקה</button>':''}</div>`);
+  if(sid) $('#sDel').onclick=()=>{
+    if(!confirm(`למחוק את הספק "${s.name}"? הפריטים שלו יישארו בלי ספק.`))return;
+    S.suppliers=S.suppliers.filter(x=>x.id!==sid);tombstone(sid);S.items.forEach(i=>{if(i.supplierId===sid){i.supplierId='';touch(i)}});
+    closeDlg();commit();toast('הספק נמחק');
+  };
+  $('#sSave').onclick=()=>{
+    const name=$('#sName').value.trim(); if(!name){$('#sName').focus();toast('צריך שם לספק');return}
+    const data={name,phone:$('#sPhone').value.trim(),coverDays:+$('#sDays').value||''};
+    if(sid){
+      const cur=supById(sid); // מאתרים מחדש, כמו בעריכת פריט
+      if(!cur){closeDlg();toast('הספק נמחק במכשיר אחר');return}
+      touch(Object.assign(cur,data));
+    } else S.suppliers.push(touch({id:uid(),...data}));
+    closeDlg();commit();toast(sid?'הספק עודכן':'הספק נוסף');
+  };
+  $('#sName').focus();
+}
+
+const REASONS={
+  add:{raw:['קבלת סחורה','תיקון'],product:['קבלת סחורה','החזרה','תיקון']},
+  remove:{raw:['שימוש','פחת / פג תוקף','תיקון'],product:['מכירה','פחת / פג תוקף','תיקון']}
+};
+function adjustItem(id){
+  const it=byId(id); let mode='add';
+  openDlg(`<h3>${esc(it.name)}</h3><p class="sub">במלאי עכשיו: <b>${fmt(it.qty)} ${esc(it.unit)}</b></p>
+    <div class="seg" id="mSeg"><button data-m="add" class="on">הוספה</button><button data-m="remove">הורדה</button><button data-m="set">ספירה</button></div>
+    <label class="f" for="aAmt" id="aLbl">כמות להוספה</label>
+    <input class="in" id="aAmt" type="number" inputmode="decimal" min="0" step="any">
+    <div id="rBox"><label class="f" for="aReason">סיבה</label><select class="in" id="aReason"></select></div>
+    <div class="row" id="recvBox">
+      <div><label class="f" for="aPrice">מחיר ליחידה (₪)</label><input class="in" id="aPrice" type="number" inputmode="decimal" min="0" step="any" value="${it.price||''}"></div>
+      <div><label class="f" for="aExp">תוקף</label><input class="in" id="aExp" type="date"></div>
+    </div>
+    <label class="f" for="aNote">הערה (לא חובה)</label><input class="in" id="aNote" placeholder="מספר חשבונית…">
+    <div class="btns"><button class="btn gold" id="aSave">עדכון מלאי</button><button class="btn ghost" data-act="closeDlg">ביטול</button></div>`);
+  const syncRecv=()=>{$('#recvBox').hidden=ui.simple||!(mode==='add'&&$('#aReason').value==='קבלת סחורה')};
+  const setMode=m=>{mode=m;
+    $('#mSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+    $('#aLbl').textContent=m==='add'?'כמות להוספה':m==='remove'?'כמות להורדה':'כמות שנספרה בפועל';
+    $('#rBox').hidden=m==='set';
+    if(m!=='set') $('#aReason').innerHTML=REASONS[m][it.type==='product'?'product':'raw'].map(r=>`<option>${r}</option>`).join('');
+    if(m==='set') $('#aAmt').value=it.qty;
+    syncRecv();
+  };
+  setMode('add');
+  $('#aReason').onchange=syncRecv;
+  $('#mSeg').onclick=e=>{const b=e.target.closest('button');if(b)setMode(b.dataset.m)};
+  $('#aSave').onclick=()=>{
+    const it=byId(id); // מאתרים מחדש: סנכרון בזמן שהחלון פתוח מחליף את האובייקטים
+    if(!it){closeDlg();toast('הפריט נמחק במכשיר אחר');return}
+    const v=r2($('#aAmt').value); if($('#aAmt').value===''||v<0){toast('צריך להזין כמות');return}
+    const note=$('#aNote').value.trim();
+    if(mode==='set') applyDelta(it,v-it.qty,'ספירת מלאי',note);
+    else{
+      if(!v){toast('צריך כמות גדולה מ-0');return}
+      const reason=$('#aReason').value, extra={};
+      if(mode==='add'&&reason==='קבלת סחורה'){
+        const p=$('#aPrice').value; if(p!==''){it.price=r2(p);extra.cost=r2(v*it.price)}
+        const ex=$('#aExp').value;
+        // שומרים את התוקף הקרוב: אם נשאר מלאי ישן עם תאריך מוקדם יותר, נשארים איתו
+        if(ex) it.exp=(it.qty>0&&it.exp&&it.exp<ex)?it.exp:ex;
+        touch(it);
+      }
+      applyDelta(it,mode==='add'?v:-v,reason,note,extra);
+    }
+    closeDlg();commit();toast('המלאי עודכן');
+  };
+  $('#aAmt').focus();
+}
+
+/* ---------- אירועים ---------- */
+document.addEventListener('click',e=>{
+  const nb=e.target.closest('#nav button'); if(nb){view=nb.dataset.view;render();scrollTo(0,0);return}
+  const fb=e.target.closest('[data-filter]'); if(fb){filter=fb.dataset.filter;render();return}
+  const a=e.target.closest('[data-act]'); if(!a) return;
+  const act=a.dataset.act, row=a.closest('.item'), id=row&&row.dataset.id;
+  switch(act){
+    case 'new': editItem(null); break;
+    case 'edit': editItem(id); break;
+    case 'adjust': adjustItem(id); break;
+    case 'inc': case 'dec': {const it=byId(id);if(!it)break;if(act==='dec'&&it.qty<=0){toast('הכמות כבר 0');break}
+      applyDelta(it,act==='inc'?1:-1,'עדכון מהיר','');commit(true);patchItemRow(it,act);break}
+    case 'incPack': {const it=byId(id);if(!it)break;applyDelta(it,+it.pack,'קבלת סחורה','קרטון');commit(true);patchItemRow(it,act);toast(`נוסף קרטון: ${fmt(it.pack)} ${it.unit}`);break}
+    case 'exportCSV': exportCSV(); break;
+    case 'seed': seed(); break;
+    case 'closeDlg': closeDlg(); break;
+    case 'waOrder': {const g=orderGroups()[+a.dataset.g];if(!g)break;
+      const num=g.sup&&g.sup.phone?waNum(g.sup.phone):'';
+      open(`https://wa.me/${num}?text=`+encodeURIComponent(orderText(g)),'_blank');break}
+    case 'copyOrder': {const g=orderGroups()[+a.dataset.g];if(!g)break;
+      navigator.clipboard?.writeText(orderText(g)).then(()=>toast('הועתק'),()=>toast('ההעתקה נכשלה'));break}
+    case 'supNew': editSupplier(null); break;
+    case 'supEdit': editSupplier(a.dataset.sid); break;
+    case 'gotoSettings': closeDlg();view='settings';render();scrollTo(0,0); break;
+    case 'install': if(deferredInstall){deferredInstall.prompt();deferredInstall.userChoice.finally(()=>{deferredInstall=null;render()})} break;
+    case 'login': login(); break;
+    case 'logout': clearToken();setSync('local');render();toast('התנתקת'); break;
+    case 'export': exportData(); break;
+    case 'import': $('#importFile').click(); break;
+    case 'wipe': wipe(); break;
+    case 'back': view='stock';render(); break;
+  }
+});
+const SEARCH_DEBOUNCE_MS=200;
+let searchTimer=null;
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.id==='search'){
+    if(e.isComposing) return;            // לא לרנדר באמצע הקלדה עם מקלדת חיזוי/IME
+    query=t.value.trim();                // הערך מתעדכן מיד; רק הציור מחכה
+    clearTimeout(searchTimer);
+    searchTimer=setTimeout(()=>{searchTimer=null;render()},SEARCH_DEBOUNCE_MS);
+  }
+});
+document.addEventListener('change',e=>{
+  if(e.target.id==='uiSimple'){ui.simple=e.target.checked;saveJSON(LS_UI,ui);render();toast(ui.simple?'מצב פשוט הופעל':'מצב מלא הופעל')}
+  if(e.target.id==='sCover'){const v=Math.max(1,Math.round(+e.target.value||3));S.coverDays=v;S.metaMtime=Date.now();commit();toast('נשמר')}
+});
+$('#fab').onclick=()=>editItem(null);
+$('#settingsBtn').onclick=()=>{view='settings';render();scrollTo(0,0)};
+$('#syncBtn').onclick=()=>{if(cfgOK())pull(true);else{view='settings';render()}};
+
+function addDefaults(){
+  let added=0;
+  DEFAULT_ITEMS.forEach(([type,name,unit])=>{
+    if(!S.items.some(i=>i.name===name)){S.items.push(touch({id:uid(),type,name,unit,qty:0,min:0,notes:'',price:'',supplierId:'',exp:''}));added++}
+  });
+  S.defaultsV=DEFAULTS_V; return added;
+}
+function ensureDefaults(){
+  if((S.defaultsV||0)>=DEFAULTS_V) return;
+  if((S.defaultsV||0)>=2) S.items=S.items.filter(i=>{const gone=i.type==='raw'&&REMOVED_RAWS.includes(i.name);if(gone)tombstone(i.id);return !gone});
+  const n=addDefaults(); commit(); if(n) toast(`נוספו ${n} פריטים בסיסיים למלאי`);
+}
+function seed(){const n=addDefaults();commit();toast(n?`נוספו ${n} פריטים`:'כל הפריטים הבסיסיים כבר קיימים')}
+function csvCell(v){
+  if(typeof v==='number') return String(v);
+  let t=String(v??'');
+  if(/^[=+\-@\t\r]/.test(t)) t="'"+t;           // מונע מאקסל להריץ טקסט שמתחיל ב-= כנוסחה
+  return /[",\r\n]/.test(t)?'"'+t.replace(/"/g,'""')+'"':t;
+}
+function downloadBlob(blob,name){
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function exportCSV(){
+  const head=['שם','סוג','יחידה','כמות','מינימום','מחיר'];
+  const rows=[...S.items]
+    .sort((a,b)=>TYPES.indexOf(a.type)-TYPES.indexOf(b.type)||a.name.localeCompare(b.name,'he'))
+    .map(i=>[i.name,TYPE_LABEL[i.type]||i.type,i.unit,+i.qty||0,+i.min||0,i.price===''||i.price==null?'':+i.price]);
+  // BOM בתחילת הקובץ: בלעדיו אקסל קורא את העברית כג'יבריש
+  const csv='\uFEFF'+[head,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n');
+  downloadBlob(new Blob([csv],{type:'text/csv;charset=utf-8'}),'inventory.csv');
+  toast('הקובץ ירד');
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`amka-inventory-${new Date().toISOString().slice(0,10)}.json`;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+$('#importFile').onchange=async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  try{const d=normalize(JSON.parse(await f.text()));if(!confirm(`לייבא ${d.items.length} פריטים ולהחליף את הנתונים הקיימים?`))return;
+    d.epoch=uid();S=d;commit();toast('הגיבוי יובא')}catch(err){toast('הקובץ לא תקין')}
+};
+function wipe(){
+  if(!confirm('למחוק את כל הפריטים, הספקים והיומן? אי אפשר לבטל.'))return;
+  S=normalize({defaultsV:DEFAULTS_V,epoch:uid()});commit();view='stock';render();toast('כל הנתונים נמחקו');
+}
+
+/* ---------- סנכרון בענן (השרת של בורקס עמקה) ---------- */
+function getToken(){try{return localStorage.getItem(TOKEN_KEY)||''}catch(e){return ''}}
+function clearToken(){try{localStorage.removeItem(TOKEN_KEY)}catch(e){}}
+function cfgOK(){return !!getToken()}
+function setSync(st,txt){
+  syncState=st;const b=$('#syncBtn');
+  b.className='sync '+({ok:'ok',busy:'busy',err:'err'}[st]||'');
+  $('#syncTxt').textContent=txt||({local:'מקומי',ok:'מסונכרן',busy:'שומר…',err:'שגיאה',offline:'לא מקוון'}[st]);
+}
+function errMsg(status){return status===401?'פג תוקף הכניסה – צריך להתחבר מחדש':status===413?'נתוני המלאי גדולים מדי':status===429?'יותר מדי ניסיונות – נסה שוב בעוד כמה דקות':'שגיאת סנכרון'}
+const API_TIMEOUT_MS=10000;
+async function api(path,opts={}){
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),API_TIMEOUT_MS);
+  try{
+    const r=await fetch(API_URL+path,{...opts,signal:ctrl.signal,headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken(),...(opts.headers||{})}});
+    if(r.status===409){const e=new Error('conflict');e.status=409;e.body=await r.json();throw e} // מכשיר אחר שמר בינתיים
+    if(!r.ok){
+      if(r.status===401){clearToken();setTimeout(()=>{if(view==='settings')render()},0)}
+      let m='';try{m=(await r.json()).error||''}catch(_){}
+      const e=new Error(r.status===401||!m?errMsg(r.status):m);e.status=r.status;throw e;
+    }
+    return await r.json();               // await בתוך ה-try: גם קריאת גוף התשובה מוגבלת בזמן
+  }catch(e){
+    if(e.name==='AbortError'){const t=new Error('החיבור איטי מדי – נסה שוב');t.timeout=true;throw t}
+    if(e instanceof TypeError) throw new Error('אין חיבור לשרת'); // fetch נכשל ברמת הרשת
+    throw e;
+  }finally{clearTimeout(timer)}
+}
+const LS_BASE='amka_inv_base_v1';          // המצב האחרון שידוע שנמצא בענן = נקודת המוצא המשותפת למיזוג התלת-כיווני
+const LOG_KEEP_DAYS=RATE_DAYS+1;           // שמירה לפי גיל; יום מרווח נוסף כדי שחלון חישוב הקצב יהיה תמיד מלא
+const TOMB_KEEP_DAYS=60;                   // כמה זמן זוכרים מחיקות, כדי שמכשיר מנותק לא יחזיר פריטים שנמחקו
+const SET_REASONS=['ספירת מלאי','ספירת סוף יום']; // ספירות מוחלטות: בשחזור קובעים כמות = after, ולא מוסיפים delta
+
+let localRev=0;                            // עולה בכל שמירה מקומית; כך הסנכרון מזהה עריכות שנעשו באמצע בקשה
+let syncing=null, syncAgain=false;
+
+/* ---------- מבנה הנתונים ---------- */
+function normalize(d){
+  d=d&&typeof d==='object'?d:{};
+  return{
+    items:Array.isArray(d.items)?d.items:[],
+    log:Array.isArray(d.log)?d.log:[],
+    suppliers:Array.isArray(d.suppliers)?d.suppliers:[],
+    tomb:d.tomb&&typeof d.tomb==='object'&&!Array.isArray(d.tomb)?d.tomb:{}, // {מזהה: זמן המחיקה}
+    epoch:typeof d.epoch==='string'?d.epoch:'',  // משתנה באיפוס/ייבוא = "זה מאגר נתונים חדש, לא למזג"
+    coverDays:+d.coverDays||3,
+    metaMtime:+d.metaMtime||0,                   // השינוי האחרון בהגדרות הכלליות (coverDays)
+    updatedAt:+d.updatedAt||0,
+    defaultsV:+d.defaultsV||0
+  };
+}
+
+/* לקרוא ל-touch(obj) בכל עריכה של פרטי פריט או ספק (שם, מינימום, מחיר, תוקף, ספק...).
+   כמויות הן לא "פרטים": הן מחושבות מהיומן בזמן המיזוג. */
+function touch(o){
+  o.rev=(+o.rev||0)+1;   // מונה גרסאות: הוא שקובע במיזוג, לא השעון
+  o.mtime=Date.now();    // נשאר רק כשובר שוויון כשאותה גרסה נערכה בשני מכשירים
+  return o;
+}
+/* לקרוא ל-tombstone(id) במחיקת פריט או ספק, כדי שהמחיקה תשרוד מיזוג. */
+function tombstone(id){S.tomb[id]=Date.now()}
+
+/* ---------- שמירת היומן ---------- */
+function pruneState(st,now=Date.now()){
+  // שומרים לכל פריט את הזמן שבו הופיע לראשונה, לפני שרשומות ישנות נמחקות, כדי ש-computeRates יחשב טווח זמן נכון
+  // (אחרת מחיקת הרשומה הראשונה מקצרת את הטווח ומנפחת את הקצב).
+  const first={};
+  for(const e of st.log) if(!(e.itemId in first)||e.ts<first[e.itemId]) first[e.itemId]=e.ts;
+  for(const it of st.items) it.firstTs=Math.min(it.firstTs||now,first[it.id]??now);
+  // חיתוך לפי גיל בלבד: אף פעם לא מוחקים משהו בתוך חלון חישוב הקצב, לא משנה כמה רשומות יש.
+  const cutoff=now-LOG_KEEP_DAYS*864e5;
+  st.log=st.log.filter(e=>e.ts>=cutoff);
+  const tCut=now-TOMB_KEEP_DAYS*864e5;
+  for(const id in st.tomb) if(st.tomb[id]<tCut) delete st.tomb[id];
+  return st;
+}
+
+async function commit(skipRender=false){
+  if(!booted) return;         // הגנה: לא לשמור מצב ריק לפני שהנתונים נטענו
+  localRev++;                 // מסמן שהמצב המקומי השתנה מאז צילום הסנכרון האחרון
+  S.updatedAt=Date.now();
+  pruneState(S);              // מחליף את S.log.slice(-2000)
+  if(!skipRender) render();   // המסך מתעדכן מיד; השמירה ממשיכה ברקע
+  schedulePush();
+  await persist();
+}
+
+function computeRates(){
+  rates={};
+  const now=Date.now(), from=now-RATE_DAYS*864e5, used={};
+  for(const e of S.log)
+    if(e.ts>=from&&e.delta<0&&!NOT_CONSUMPTION.includes(e.reason)) used[e.itemId]=(used[e.itemId]||0)-e.delta;
+  for(const it of S.items){
+    if(!used[it.id]) continue;
+    // הטווח מתחיל מהזמן שבו הפריט הופיע לראשונה (נשמר גם אחרי חיתוך), ומוגבל לחלון חישוב הקצב.
+    const start=Math.max(it.firstTs||now,from), days=(now-start)/864e5;
+    if(days>=2) rates[it.id]=used[it.id]/days;
+  }
+}
+
+/* ---------- מיזוג (מבוסס תנועות) ---------- */
+function makeBase(st){
+  // צילום של מה שיש בענן אחרי סנכרון מוצלח: כמות לכל פריט + מזהי התנועות שכבר נכללו בה.
+  return{binId:SERVER_ID,epoch:st.epoch,qty:Object.fromEntries(st.items.map(i=>[i.id,i.qty])),ids:st.log.map(e=>e.id)};
+}
+
+// מי מנצח בין שני עותקים של אותו פריט: גרסה גבוהה יותר; בשוויון – זמן עריכה;
+// ואם גם הוא שווה – השוואת תוכן קבועה, כדי שכל המכשירים יבחרו את אותו עותק.
+function newerCopy(a,b){
+  const ra=+a.rev||0, rb=+b.rev||0;
+  if(ra!==rb) return ra>rb;
+  const ta=+a.mtime||0, tb=+b.mtime||0;
+  if(ta!==tb) return ta>tb;
+  return JSON.stringify(a)>JSON.stringify(b);
+}
+function mergeById(localArr,remoteArr,tomb){
+  // איחוד לפי מזהה; הפרטים נלקחים מהעותק עם הגרסה (rev) הגבוהה. פריטים שנמחקו מוסרים.
+  const m=new Map(remoteArr.map(x=>[x.id,{...x}]));
+  for(const l of localArr){
+    const r=m.get(l.id);
+    const pick=!r||newerCopy(l,r)?{...l}:r;
+    if(r&&(l.firstTs||r.firstTs)) pick.firstTs=Math.min(l.firstTs||Infinity,r.firstTs||Infinity);
+    m.set(l.id,pick);
+  }
+  return [...m.values()].filter(x=>!tomb[x.id]);
+}
+
+function mergeStates(local,remote,base){
+  // 1) יומן: איחוד לפי מזהה תנועה; סדר קבוע (זמן, ואז מזהה) כדי שכל המכשירים ישחזרו בדיוק אותו דבר.
+  const logMap=new Map(remote.log.map(e=>[e.id,e]));
+  for(const e of local.log) if(!logMap.has(e.id)) logMap.set(e.id,e);
+  const log=[...logMap.values()].sort((a,b)=>a.ts-b.ts||(a.id<b.id?-1:a.id>b.id?1:0));
+
+  // 2) מחיקות: איחוד, שומרים את זמן המחיקה המאוחר ביותר.
+  const tomb={...remote.tomb};
+  for(const [id,ts] of Object.entries(local.tomb)) tomb[id]=Math.max(tomb[id]||0,ts);
+
+  // 3) פריטים וספקים: איחוד, ובפרטים העריכה האחרונה קובעת.
+  const items=mergeById(local.items,remote.items,tomb);
+  const suppliers=mergeById(local.suppliers,remote.suppliers,tomb);
+
+  // 4) כמויות.
+  //  א) פריטים שיש להם ספירה ביומן: כמות = הספירה האחרונה + כל השינויים שאחריה (לפי סדר הזמן).
+  //     מחושב מהיומן הממוזג בלבד, כך שכל המכשירים מגיעים לאותה תוצאה גם כשספירה שנעשתה בלי אינטרנט
+  //     מגיעה אחרי שמכירות חדשות יותר כבר סונכרנו (שחזור שלה על נקודת המוצא היה מבטל אותן).
+  //     מתחילים מהספירה הראשונה ומעדכנים את ה-delta של כל ספירה שאחריה לפי הכמות שחושבה,
+  //     כדי שספירה שנעשתה במכשיר אחר לא תיספר פעמיים בקצב הצריכה.
+  const qty={}, lastSet={}, firstSet={};
+  log.forEach((e,i)=>{if(SET_REASONS.includes(e.reason)){lastSet[e.itemId]=i;if(!(e.itemId in firstSet))firstSet[e.itemId]=i}});
+  for(const id in firstSet){
+    let q=r2(log[firstSet[id]].after);
+    for(let i=firstSet[id]+1;i<log.length;i++){
+      const e=log[i]; if(e.itemId!==id) continue;
+      if(SET_REASONS.includes(e.reason)){e.delta=r2(e.after-q);q=r2(e.after)}
+      else q=Math.max(0,r2(q+e.delta));
+    }
+    qty[id]=q;
+  }
+  //  ב) כל השאר: הכמות בנקודת המוצא המשותפת + תנועות שנקודת המוצא עוד לא ראתה.
+  //     אם אין נקודת מוצא שמורה (סנכרון ראשון אחרי העדכון), המצב בענן משמש כנקודת מוצא,
+  //     ומשחזרים עליו רק תנועות שקיימות במכשיר בלבד.
+  const b=base||makeBase(remote);
+  const baseIds=new Set(b.ids), remoteIds=new Set(remote.log.map(e=>e.id));
+  const remoteQty=Object.fromEntries(remote.items.map(i=>[i.id,i.qty]));
+  const delta={};
+  for(const e of log){
+    const id=e.itemId, inBase=id in b.qty;
+    if(id in lastSet||baseIds.has(e.id)) continue;   // מעוגן בספירה, או שכבר כלול בכמות של נקודת המוצא
+    if(!inBase&&remoteIds.has(e.id)) continue;       // פריט שנקודת המוצא לא מכירה: הכמות בענן כבר כוללת את התנועות שבענן
+    if(!(id in delta)) delta[id]=inBase?b.qty[id]:(remoteQty[id]??0);
+    delta[id]=Math.max(0,r2(delta[id]+e.delta));
+  }
+  Object.assign(qty,delta);
+  for(const it of items){
+    if(it.id in qty) it.qty=qty[it.id];
+    else if(it.id in b.qty) it.qty=b.qty[it.id];  // לא השתנה באף צד מאז נקודת המוצא
+    if(it.qty===0) it.exp='';
+  }
+
+  // 5) הגדרות כלליות: החדש ביותר קובע.
+  const meta=(+local.metaMtime||0)>(+remote.metaMtime||0)?local:remote;
+  return{items,log,suppliers,tomb,epoch:remote.epoch,coverDays:meta.coverDays,metaMtime:meta.metaMtime,
+    defaultsV:Math.max(local.defaultsV,remote.defaultsV),updatedAt:Math.max(local.updatedAt,remote.updatedAt)};
+}
+
+function fingerprint(st){
+  // בדיקת שוויון זולה, כדי לכתוב לענן רק כשהתוצאה הממוזגת באמת שונה ממה שיש בו.
+  return JSON.stringify([st.epoch,st.coverDays,st.log.map(e=>e.id).sort(),
+    st.items.map(i=>i.id+':'+i.qty+':'+(i.rev||0)+':'+(i.mtime||0)).sort(),
+    st.suppliers.map(s=>s.id+':'+(s.rev||0)+':'+(s.mtime||0)).sort(),Object.keys(st.tomb).sort()]);
+}
+
+/* ---------- סנכרון: סבב יחיד של קריאה-מיזוג-כתיבה ---------- */
+function schedulePush(){
+  if(!cfgOK())return;
+  localStorage.setItem(LS_PENDING,'1');setSync('busy');
+  clearTimeout(pushTimer);pushTimer=setTimeout(push,1200);
+}
+// push ו-pull הם עכשיו אותה פעולה: תמיד קריאה ← מיזוג ← כתיבה, אף פעם לא דריסה עיוורת.
+function push(){pushTimer=null;return sync()}
+function pull(manual){return sync({manual})}
+
+function sync(opts={}){
+  if(!booted||!cfgOK())return Promise.resolve(); // לפני האתחול S ריק – מיזוג שלו עלול למחוק נתונים בענן
+  if(!navigator.onLine){setSync('offline');return Promise.resolve()}
+  if(syncing){syncAgain=true;return syncing}     // סבב אחד בכל פעם; בקשות שמגיעות בינתיים מתאחדות לסבב המשך אחד
+  syncing=runSync(opts).finally(()=>{syncing=null;if(syncAgain){syncAgain=false;sync()}});
+  return syncing;
+}
+
+async function runSync({manual=false,adopt=false}={}){
+  setSync('busy','מסנכרן…');
+  try{
+    const got=await api('/api/admin/inventory');
+    const remote=normalize(got.data); remoteVersion=+got.version||0;
+    let base=loadJSON(LS_BASE,null); if(base&&base.binId!==SERVER_ID) base=null;
+    const remoteEmpty=!remote.items.length&&!remote.log.length;
+    let next,msg='';
+    // המיזוג רץ מול S הנוכחי, כך שעריכות שנעשו בזמן הקריאה מהענן נכללות.
+    if(adopt&&!base) next=remoteEmpty?S:remote;              // מכשיר שמצטרף ל-Bin קיים
+    else if(remote.epoch!==S.epoch){
+      if(base&&base.epoch===remote.epoch) next=S;            // המכשיר הזה איפס/ייבא ← הנתונים שלו קובעים
+      else if(!base&&remoteEmpty) next=S;
+      else{next=remote;msg='הנתונים אופסו או יובאו במכשיר אחר'} // מכשיר אחר איפס/ייבא ← מאמצים את הנתונים שלו
+    }
+    else if(!base&&remoteEmpty) next=S;
+    else next=pruneState(mergeStates(S,remote,base&&base.epoch===remote.epoch?base:null));
+
+    if(next!==S&&fingerprint(next)===fingerprint(S)) next=S; // לא השתנה כלום – משאירים את אותו אובייקט
+    const localChanged=next!==S;
+    const mustPut=fingerprint(next)!==fingerprint(remote);
+    const rev=localRev;
+    const snap=makeBase(next);                 // צילום לפני הכתיבה: עריכות מאוחרות יותר לא אמורות לזלוג לנקודת המוצא
+    S=next;
+    if(localChanged) safeRender();
+    await persist();                           // נשמר במכשיר לפני הכתיבה לענן
+    if(mustPut){
+      const put=await api('/api/admin/inventory',{method:'PUT',body:JSON.stringify({data:next,baseVersion:remoteVersion})});
+      remoteVersion=put.version;
+    }
+    saveJSON(LS_BASE,snap);                    // בענן יש עכשיו בדיוק את snap ← נקודת מוצא משותפת חדשה
+    if(localRev===rev) localStorage.removeItem(LS_PENDING); else syncAgain=true; // נערך בזמן הכתיבה ← סבב נוסף
+    setSync('ok');
+    if(msg) toast(msg); else if(manual) toast(mustPut||localChanged?'סונכרן':'הכל מעודכן');
+    ensureDefaults();
+  }catch(e){
+    // מכשיר אחר שמר בין הקריאה לכתיבה: הנתונים במכשיר כבר נשמרו מקומית, מריצים סבב נוסף שימזג מול הגרסה החדשה
+    if(e.status===409){syncAgain=true;setSync('busy','מסנכרן…');return}
+    setSync('err',e.status===401?'צריך להתחבר':undefined);toast(e.message);
+  }   // הסימון "ממתין" נשאר ← ניסיון חוזר בחזרת חיבור, בחזרה לאפליקציה או בשמירה הבאה
+}
+
+// כניסה עם הסיסמה של לוח הבקרה. הטוקן נשמר באותו מקום כמו בלוח הבקרה, אז כניסה באחד מספיקה לשניהם.
+async function login(){
+  const pw=$('#cPass')?$('#cPass').value:'';
+  if(!pw){toast('צריך להזין סיסמה');return}
+  setSync('busy','מתחבר…');
+  try{
+    const r=await fetch(API_URL+'/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw})});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||!d.token){setSync('local');toast(d.error||'הכניסה נכשלה');return}
+    try{localStorage.setItem(TOKEN_KEY,d.token)}catch(e){}
+    await sync({manual:true,adopt:true});      // מכשיר חדש מאמץ את הנתונים שכבר בשרת (אם יש)
+    if(syncState==='ok'){view='stock';render()}
+  }catch(e){setSync('err');toast('אין חיבור לשרת')}
+}
+
+/* ---------- מחיקת נתונים אוטומטית ---------- */
+function isIOSDevice(){
+  const ua=navigator.userAgent;
+  return /iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+}
+function storageRiskBanner(){
+  const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+  const safari=/^((?!chrome|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent);
+  // ספארי (וכל דפדפן באייפון, כי כולם רצים על WebKit) מוחק נתוני אתר אחרי 7 ימים בלי כניסה.
+  // אפליקציות שהותקנו למסך הבית פטורות, ולכן האזהרה נעלמת אחרי ההתקנה.
+  if(standalone||!(isIOSDevice()||safari)) return '';
+  return `<div class="panel" style="border-color:var(--low);background:var(--low-soft)">
+    <h2 style="color:var(--low)">הנתונים במכשיר עלולים להימחק</h2>
+    <p style="margin:0">בספארי ובאייפון, הדפדפן מוחק נתונים שנשמרו באתר אחרי 7 ימים בלי כניסה – כולל הכניסה לחשבון, ההגדרות ושינויים שעוד לא סונכרנו. הנתונים שכבר סונכרנו לשרת נשמרים שם.</p>
+    <p class="note" style="color:var(--ink)">כדי להגן עליהם: ${isIOSDevice()?'כפתור השיתוף ⬆︎ ← "הוספה למסך הבית"':'התקן את האפליקציה למסך הבית'}, ופתח אותה משם.</p></div>`;
+}
+// מבקש מכרום/פיירפוקס לפטור את האתר ממחיקה אוטומטית (לא עושה כלום איפה שלא נתמך).
+function requestPersistentStorage(){
+  try{navigator.storage&&navigator.storage.persist&&navigator.storage.persisted().then(p=>p||navigator.storage.persist())}catch(e){}
+}
+
+function renderSettings(){
+  const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+  return `${storageRiskBanner()}
+  <div class="panel"><label class="switch-row" for="uiSimple"><span><h2 style="margin:0">מצב פשוט</h2><span class="note" style="color:var(--muted);font-size:.9rem">מסתיר מחיר, תוקף, ספקים והערות</span></span><input type="checkbox" id="uiSimple" ${ui.simple?'checked':''}></label></div>
+  ${ui.simple?'':`<div class="panel"><h2>ספקים</h2>
+    ${S.suppliers.length?S.suppliers.map(s=>`<div class="sup-row"><span>${esc(s.name)}<small>${esc(s.phone||'ללא טלפון')}${s.coverDays?` · משלוח כל ${s.coverDays} ימים`:''} · ${S.items.filter(i=>i.supplierId===s.id).length} פריטים</small></span><button class="btn ghost" data-act="supEdit" data-sid="${s.id}" style="padding:7px 12px">עריכה</button></div>`).join(''):'<p class="note" style="margin-top:0">עוד אין ספקים.</p>'}
+    <div class="btns"><button class="btn gold" data-act="supNew">הוספת ספק</button></div>
+    <p class="note">משייכים פריט לספק בעריכת הפריט.</p></div>`}
+  <div class="panel"><h2>הזמנות</h2>
+    <label class="f" for="sCover">כל כמה ימים בדרך כלל מגיעה סחורה</label>
+    <input class="in" id="sCover" type="number" inputmode="numeric" min="1" step="1" value="${S.coverDays}">
+    <p class="note">משמש לחישוב כמה להזמין. אפשר לקבוע ערך אחר לכל ספק.</p></div>
+  <div class="panel"><h2>התקנה בטלפון</h2>
+    ${standalone?'<p class="note" style="margin-top:0">האפליקציה כבר מותקנת ✓</p>'
+      :deferredInstall?'<button class="btn gold" data-act="install">התקנה במסך הבית</button>'
+      :isIOSDevice()?'<p class="note" style="margin-top:0">בספארי: כפתור השיתוף ⬆︎ ← "הוספה למסך הבית".</p>'
+      :'<p class="note" style="margin-top:0">בכרום: תפריט ⋮ ← "התקנת אפליקציה" או "הוספה למסך הבית".</p>'}</div>
+  <div class="panel"><h2>סנכרון בענן</h2>
+    ${cfgOK()
+      ?`<p class="note" style="margin-top:0">מחובר ✓ המלאי נשמר בשרת של בורקס עמקה ומסונכרן בין כל המכשירים שמחוברים.</p>
+        <div class="btns"><button class="btn ghost" data-act="logout">התנתקות</button><a class="btn ghost" href="panel-x7k2.html" style="text-decoration:none">ללוח ההזמנות</a></div>`
+      :`<p class="note" style="margin-top:0">הכניסה היא עם הסיסמה של לוח הבקרה. בלי כניסה המלאי נשמר רק במכשיר הזה.</p>
+        <label class="f" for="cPass">סיסמה</label>
+        <input class="in" id="cPass" type="password" autocomplete="current-password" dir="ltr">
+        <div class="btns"><button class="btn gold" data-act="login">כניסה</button></div>`}
+  </div>
+  <div class="panel"><h2>גיבוי</h2>
+    <div class="btns" style="margin-top:0"><button class="btn ghost" data-act="export">ייצוא לקובץ</button><button class="btn ghost" data-act="exportCSV">ייצוא לאקסל</button><button class="btn ghost" data-act="import">ייבוא מקובץ</button></div>
+    <p class="note">ייבוא מחליף את כל הנתונים הנוכחיים, בכל המכשירים.</p></div>
+  <div class="panel"><h2>איפוס</h2>
+    <button class="btn danger" data-act="wipe">מחיקת כל הנתונים</button>
+    <p class="note">מוחק מהמכשיר וגם מהענן אם מחובר.</p></div>
+  <div class="btns"><button class="btn ghost block" data-act="back">חזרה למלאי</button></div>`;
+}
+
+addEventListener('online',()=>{if(localStorage.getItem(LS_PENDING))push();else pull()});
+addEventListener('offline',()=>cfgOK()&&setSync('offline'));
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')pull()});
+
+/* ---------- התקנה (PWA) ---------- */
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;if(view==='settings')render()});
+addEventListener('appinstalled',()=>{deferredInstall=null;toast('האפליקציה הותקנה')});
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+/* ---------- הפעלה ---------- */
+// חוסמים לחיצות עד שהנתונים נטענו (שלב capture – לפני כל מאזין אחר)
+document.addEventListener('click',e=>{if(!booted){e.stopPropagation();e.preventDefault()}},true);
+async function boot(){
+  $('#app').innerHTML='<div class="empty"><p>טוען…</p></div>';
+  requestPersistentStorage();
+  S=await loadDataDB();
+  booted=true;
+  render();
+  if(cfgOK()){setSync('busy','טוען…');await pull()}
+  else{setSync('local');ensureDefaults();view='settings';render()} // לא מחובר: פותחים ישר את מסך הכניסה
+}
+boot();
+</script>
+</body>
+</html>
