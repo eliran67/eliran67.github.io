@@ -93,6 +93,36 @@
   }
 
   .refresh-note{text-align:center; font-size:11.5px; color:#8a7461; margin-top:14px;}
+
+  .backup-alert{
+    background:#FFF4DC; color:#7a5200; border:1px solid #f0d28a; border-radius:12px;
+    padding:10px 12px; font-size:12.5px; line-height:1.6; margin-bottom:14px;
+  }
+  .backup-alert:empty{display:none;}
+  .stats-card{
+    background:#fff; border-radius:16px; padding:14px 16px; margin-bottom:14px; border:1px solid var(--line);
+    box-shadow:0 4px 14px rgba(46,27,18,0.06);
+  }
+  .stats-card h2{font-size:14px; color:var(--coffee-2); margin-bottom:10px;}
+  .stats-tiles{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .stats-tile{background:var(--cream); border-radius:12px; padding:10px 12px;}
+  .stats-tile .label{font-size:11.5px; color:#8a7461;}
+  .stats-tile .value{font-family:'Rubik',sans-serif; font-weight:800; font-size:22px; color:var(--coffee-2); line-height:1.3;}
+  .stats-tile .delta{font-size:11.5px; color:#6b5644;}
+  .stats-tile .delta.up{color:#3c6b2f;} .stats-tile .delta.down{color:#a8431f;}
+  .stats-card details{margin-top:12px; font-size:12.5px;}
+  .stats-card summary{cursor:pointer; color:var(--terracotta); font-weight:700; padding:4px 0;}
+  .stats-table{width:100%; border-collapse:collapse; margin-top:8px; font-size:12.5px;}
+  .stats-table th,.stats-table td{padding:6px 4px; text-align:right; border-bottom:1px solid var(--line);}
+  .stats-table th{color:#8a7461; font-weight:600; font-size:11.5px;}
+  .stats-table td.num,.stats-table th.num{text-align:left; font-variant-numeric:tabular-nums;}
+  .stats-sub{font-weight:700; color:var(--coffee-2); margin:14px 0 2px;}
+  .stats-note{color:#8a7461; font-size:11.5px; line-height:1.6; margin-top:10px;}
+  .backup-row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:12px; padding-top:12px; border-top:1px solid var(--line); font-size:12.5px; color:#6b5644;}
+  .backup-row button{
+    white-space:nowrap; padding:8px 12px; border-radius:10px; border:1.5px solid var(--line); background:#fff;
+    font-family:inherit; font-size:12.5px; font-weight:700; color:var(--coffee-2); cursor:pointer;
+  }
 </style>
 </head>
 <body>
@@ -118,6 +148,8 @@
   </header>
   <main>
     <div class="email-alert" id="emailAlert" role="alert"></div>
+    <div class="backup-alert" id="backupAlert" role="status"></div>
+    <section class="stats-card" id="statsCard" hidden></section>
     <div class="toolbar" id="toolbar"></div>
     <div id="ordersList"></div>
     <div class="refresh-note">מתעדכן אוטומטית כל 30 שניות · <a href="#" onclick="loadOrders(); return false;" style="color:var(--terracotta); font-weight:700;">רענן עכשיו</a></div>
@@ -188,6 +220,7 @@ function showDashboard(){
   document.getElementById('dashboard').style.display = 'block';
   renderToolbar();
   loadOrders();
+  loadStats();
   pollTimer = setInterval(loadOrders, 30000);
 }
 
@@ -306,9 +339,108 @@ async function updateStatus(id, status){
     const data = await res.json().catch(() => ({}));
     showStockNote(data.stock);
     loadOrders();
+    loadStats();
   } catch(e){
     alert('עדכון הסטטוס נכשל, נסה שוב');
   }
+}
+
+
+/* ===== המספרים: סיכום שבועי + גיבוי ===== */
+const BACKUP_WARN_DAYS = 10; // הגיבוי האוטומטי רץ פעם בשבוע; אחרי 10 ימים בלי גיבוי מציגים תזכורת
+
+function weekLabel(ymd){
+  const [y, m, d] = ymd.split('-').map(Number);
+  const end = new Date(Date.UTC(y, m - 1, d + 6));
+  return `${d}.${m}–${end.getUTCDate()}.${end.getUTCMonth() + 1}`;
+}
+
+function deltaHtml(now, prev, unit){
+  if(now === prev) return `<div class="delta">כמו בשבוע שעבר</div>`;
+  const diff = now - prev;
+  return `<div class="delta ${diff > 0 ? 'up' : 'down'}">${diff > 0 ? '▲' : '▼'} ${Math.abs(diff)}${unit} מול שבוע שעבר (${prev}${unit})</div>`;
+}
+
+async function loadStats(){
+  const token = getToken();
+  if(!token) return;
+  try{
+    const res = await fetch(API_URL + '/api/admin/stats', { headers: { 'Authorization': 'Bearer ' + token } });
+    if(!res.ok) return; // שרת ישן בלי המספרים, או כניסה שפגה - פשוט לא מציגים
+    renderStats(await res.json());
+  } catch(e){}
+}
+
+function renderStats(data){
+  const weeks = data.weeks || [];
+  const card = document.getElementById('statsCard');
+  if(!weeks.length){ card.hidden = true; return; }
+  const cur = weeks[0], prev = weeks[1] || { orders: 0, revenue: 0 };
+
+  const sold = {}; let combos = 0;
+  weeks.slice(0, 4).forEach(w => {
+    combos += w.combos || 0;
+    Object.entries(w.items || {}).forEach(([name, qty]) => { sold[name] = (sold[name] || 0) + qty; });
+  });
+  const soldRows = Object.entries(sold).sort((a, b) => b[1] - a[1])
+    .map(([name, qty]) => `<tr><td>${esc(name)}</td><td class="num">${qty}</td></tr>`).join('');
+
+  const wasOpen = !!(card.querySelector('details') && card.querySelector('details').open);
+  card.hidden = false;
+  card.innerHTML = `
+    <h2>📊 המספרים · השבוע (${weekLabel(cur.week)})</h2>
+    <div class="stats-tiles">
+      <div class="stats-tile"><div class="label">הזמנות</div><div class="value">${cur.orders}</div>${deltaHtml(cur.orders, prev.orders, '')}</div>
+      <div class="stats-tile"><div class="label">מכירות</div><div class="value">${cur.revenue} ₪</div>${deltaHtml(cur.revenue, prev.revenue, ' ₪')}</div>
+    </div>
+    <details ${wasOpen ? 'open' : ''}>
+      <summary>8 השבועות האחרונים ומה נמכר</summary>
+      <table class="stats-table">
+        <tr><th>שבוע</th><th class="num">הזמנות</th><th class="num">מכירות</th><th class="num">בוטלו</th></tr>
+        ${weeks.map(w => `<tr><td>${weekLabel(w.week)}</td><td class="num">${w.orders}</td><td class="num">${w.revenue} ₪</td><td class="num">${w.cancelled}</td></tr>`).join('')}
+      </table>
+      <div class="stats-sub">מה נמכר ב-4 השבועות האחרונים</div>
+      ${soldRows ? `<table class="stats-table">${soldRows}<tr><td>מתוכם במבצע</td><td class="num">${combos}</td></tr></table>` : '<div class="stats-note">עוד אין מכירות בתקופה הזו.</div>'}
+      <div class="stats-note">נספרות רק הזמנות שנכנסו דרך האתר. שבוע = ראשון עד שבת. הזמנה שבוטלה לא נספרת במכירות.</div>
+    </details>
+    <div class="backup-row">
+      <span id="backupInfo">${backupInfoText(data.lastBackup)}</span>
+      <button type="button" onclick="downloadBackup(this)">⬇️ הורדת גיבוי</button>
+    </div>`;
+  renderBackupAlert(data.lastBackup);
+}
+
+function backupInfoText(last){
+  if(!last) return 'עוד לא נעשה גיבוי';
+  const when = new Date(last.at).toLocaleString('he-IL', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+  return `גיבוי אחרון: ${when} (${last.by === 'auto' ? 'אוטומטי' : 'ידני'})`;
+}
+
+function renderBackupAlert(last){
+  const el = document.getElementById('backupAlert');
+  const days = last ? (Date.now() - new Date(last.at).getTime()) / 864e5 : Infinity;
+  if(days <= BACKUP_WARN_DAYS){ el.textContent = ''; return; }
+  el.textContent = last
+    ? `💾 עברו ${Math.floor(days)} ימים מהגיבוי האחרון. כדאי ללחוץ על "הורדת גיבוי" למטה, ולבדוק שהגיבוי האוטומטי במחשב רץ.`
+    : '💾 עוד לא נעשה גיבוי של ההזמנות והמלאי. כדאי ללחוץ על "הורדת גיבוי" למטה.';
+}
+
+async function downloadBackup(btn){
+  btn.disabled = true;
+  try{
+    const res = await fetch(API_URL + '/api/admin/backup', { headers: { 'Authorization': 'Bearer ' + getToken() } });
+    if(res.status === 401){ logout(); return; }
+    if(!res.ok) throw new Error();
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `amka-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    loadStats();
+  } catch(e){
+    alert('הורדת הגיבוי נכשלה, נסה שוב');
+  } finally { btn.disabled = false; }
 }
 
 // אם יש טוקן שמור ותקף, כניסה ישירה
