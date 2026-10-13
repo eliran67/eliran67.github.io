@@ -620,6 +620,7 @@ document.addEventListener('click',e=>{
     case 'install': if(deferredInstall){deferredInstall.prompt();deferredInstall.userChoice.finally(()=>{deferredInstall=null;render()})} break;
     case 'login': login(); break;
     case 'logout': clearToken();setSync('local');render();toast('התנתקת'); break;
+    case 'diag': runDiag(); break;
     case 'export': exportData(); break;
     case 'import': $('#importFile').click(); break;
     case 'wipe': wipe(); break;
@@ -959,6 +960,27 @@ async function runSync({manual=false,adopt=false}={}){
   }   // הסימון "ממתין" נשאר ← ניסיון חוזר בחזרת חיבור, בחזרה לאפליקציה או בשמירה הבאה
 }
 
+// בדיקת חיבור: מריץ כמה בקשות לשרת ומציג על המסך מה קרה בכל אחת (בשביל אבחון תקלות מהטלפון)
+async function runDiag(){
+  const out=$('#diagOut'); if(!out) return;
+  const lines=[`גרסת דף: ${document.lastModified} · ${navigator.onLine?'מחובר לרשת':'אין רשת'} · ${location.host}`];
+  const show=()=>{out.textContent=lines.join('\n')};
+  const tok=getToken();
+  lines.push(`כניסה שמורה: ${tok?'כן':'לא'}${tok?' · תוקף: '+(()=>{try{return new Date(JSON.parse(atob(tok.split('.')[0])).exp).toLocaleString('he-IL')}catch(e){return '?'}})():''}`);
+  show();
+  const test=async(label,url,opts)=>{
+    const t0=performance.now(), ctrl=new AbortController(), tm=setTimeout(()=>ctrl.abort(),15000);
+    try{const r=await fetch(url,{...opts,signal:ctrl.signal,cache:'no-store'});lines.push(`${label}: ${r.status} תוך ${Math.round(performance.now()-t0)}ms`)}
+    catch(e){lines.push(`${label}: נכשל אחרי ${Math.round(performance.now()-t0)}ms (${e.name}: ${e.message})`)}
+    finally{clearTimeout(tm);show()}
+  };
+  await test('1. שרת בלי כניסה',API_URL+'/api/order',{method:'OPTIONS'});
+  await test('2. קריאת מלאי',API_URL+'/api/admin/inventory',{headers:{'Authorization':'Bearer '+tok}});
+  await test('3. שמירה (בדיקה בלבד)',API_URL+'/api/admin/inventory',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer x'},body:'{}'});
+  lines.push(`גודל נתוני המלאי במכשיר: ${Math.round(JSON.stringify(S).length/1024)}KB · מחכה לסנכרון: ${localStorage.getItem(LS_PENDING)?'כן':'לא'}`);
+  show();
+}
+
 // כניסה עם הסיסמה של לוח הבקרה. הטוקן נשמר באותו מקום כמו בלוח הבקרה, אז כניסה באחד מספיקה לשניהם.
 async function login(){
   const pw=$('#cPass')?$('#cPass').value:'';
@@ -1012,6 +1034,10 @@ function renderSettings(){
       :deferredInstall?'<button class="btn gold" data-act="install">התקנה במסך הבית</button>'
       :isIOSDevice()?'<p class="note" style="margin-top:0">בספארי: כפתור השיתוף ⬆︎ ← "הוספה למסך הבית".</p>'
       :'<p class="note" style="margin-top:0">בכרום: תפריט ⋮ ← "התקנת אפליקציה" או "הוספה למסך הבית".</p>'}</div>
+  <div class="panel"><h2>בדיקת חיבור</h2>
+    <p class="note" style="margin-top:0">אם הסנכרון לא עובד – לחץ, וצלם את התוצאה.</p>
+    <div class="btns"><button class="btn ghost" data-act="diag">בדיקת חיבור</button></div>
+    <pre id="diagOut" style="white-space:pre-wrap;direction:rtl;font-size:.85rem;margin:10px 0 0;color:var(--muted)"></pre></div>
   <div class="panel"><h2>סנכרון בענן</h2>
     ${cfgOK()
       ?`<p class="note" style="margin-top:0">מחובר ✓ המלאי נשמר בשרת של בורקס עמקה ומסונכרן בין כל המכשירים שמחוברים.</p>
