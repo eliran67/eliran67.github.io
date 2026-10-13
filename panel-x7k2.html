@@ -48,6 +48,20 @@
   }
 
   main{padding:16px; max-width:640px; margin:0 auto;}
+  .view-tabs{display:flex; gap:8px; margin-bottom:14px;}
+  .view-tab{
+    flex:1; padding:10px; border-radius:12px; border:1.5px solid var(--line); background:#fff; cursor:pointer;
+    font-family:inherit; font-size:13.5px; font-weight:700; color:var(--ink);
+  }
+  .view-tab.active{background:var(--coffee); color:#fff; border-color:var(--coffee);}
+  .cols[data-view="orders"] .col-stats, .cols[data-view="stats"] .col-orders{display:none;}
+  @media (min-width:900px){
+    main{max-width:1120px;}
+    .view-tabs{display:none;}
+    .cols{display:grid; grid-template-columns:minmax(0,1fr) 400px; gap:20px; align-items:start;}
+    .cols[data-view] .col-orders, .cols[data-view] .col-stats{display:block;}
+    .col-stats{position:sticky; top:76px; max-height:calc(100vh - 92px); overflow-y:auto;}
+  }
   .toolbar{display:flex; gap:8px; margin-bottom:14px; overflow-x:auto;}
   .filter-chip{
     white-space:nowrap; padding:7px 14px; border-radius:999px; font-size:12.5px; font-weight:600;
@@ -116,6 +130,12 @@
   .stats-table th,.stats-table td{padding:6px 4px; text-align:right; border-bottom:1px solid var(--line);}
   .stats-table th{color:#8a7461; font-weight:600; font-size:11.5px;}
   .stats-table td.num,.stats-table th.num{text-align:left; font-variant-numeric:tabular-nums;}
+  .bar-row{display:flex; align-items:center; gap:8px; padding:3px 0; font-size:12.5px;}
+  .bar-label{flex:0 0 52px; color:#6b5644;}
+  .bar-track{flex:1; height:10px; background:var(--cream-2); border-radius:999px; overflow:hidden;}
+  .bar-fill{display:block; height:100%; background:var(--crust); border-radius:999px;}
+  .bar-row.wide .bar-num{flex-basis:88px;}
+  .bar-num{flex:0 0 28px; text-align:left; font-variant-numeric:tabular-nums; color:var(--coffee-2); font-weight:600;}
   .stats-sub{font-weight:700; color:var(--coffee-2); margin:14px 0 2px;}
   .stats-note{color:#8a7461; font-size:11.5px; line-height:1.6; margin-top:10px;}
   .backup-row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:12px; padding-top:12px; border-top:1px solid var(--line); font-size:12.5px; color:#6b5644;}
@@ -149,10 +169,21 @@
   <main>
     <div class="email-alert" id="emailAlert" role="alert"></div>
     <div class="backup-alert" id="backupAlert" role="status"></div>
-    <section class="stats-card" id="statsCard" hidden></section>
-    <div class="toolbar" id="toolbar"></div>
-    <div id="ordersList"></div>
-    <div class="refresh-note">מתעדכן אוטומטית כל 30 שניות · <a href="#" onclick="loadOrders(); return false;" style="color:var(--terracotta); font-weight:700;">רענן עכשיו</a></div>
+    <!-- בטלפון: שתי לשוניות. במסך רחב: שתי עמודות זו לצד זו, והלשוניות מוסתרות -->
+    <div class="view-tabs" role="tablist">
+      <button type="button" class="view-tab" id="tabOrders" role="tab" onclick="setView('orders')">🔥 הזמנות</button>
+      <button type="button" class="view-tab" id="tabStats" role="tab" onclick="setView('stats')">📊 המספרים</button>
+    </div>
+    <div class="cols" id="cols" data-view="orders">
+      <div class="col-orders">
+        <div class="toolbar" id="toolbar"></div>
+        <div id="ordersList"></div>
+        <div class="refresh-note">מתעדכן אוטומטית כל 30 שניות · <a href="#" onclick="loadOrders(); return false;" style="color:var(--terracotta); font-weight:700;">רענן עכשיו</a></div>
+      </div>
+      <div class="col-stats">
+        <section class="stats-card" id="statsCard" hidden></section>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -218,10 +249,19 @@ function logout(){
 function showDashboard(){
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
+  setView(localStorage.getItem('borekas_admin_view') === 'stats' ? 'stats' : 'orders');
   renderToolbar();
   loadOrders();
   loadStats();
   pollTimer = setInterval(loadOrders, 30000);
+}
+
+// בטלפון מוצגת לשונית אחת בכל פעם (הזמנות או המספרים); במסך רחב שתיהן מוצגות כעמודות
+function setView(view){
+  document.getElementById('cols').dataset.view = view;
+  document.getElementById('tabOrders').classList.toggle('active', view === 'orders');
+  document.getElementById('tabStats').classList.toggle('active', view === 'stats');
+  try{ localStorage.setItem('borekas_admin_view', view); } catch(e){}
 }
 
 function renderToolbar(){
@@ -298,8 +338,10 @@ function renderOrders(){
       </div>
       <div class="order-items">${itemsHtml}</div>
       <div class="order-cust">
-        👤 ${esc(o.customer.name || 'לא צוין')} · 📞 <a href="tel:${esc(phoneDigits)}">${esc(o.customer.phone)}</a>
-        ${o.customer.notes ? '<br>📝 ' + esc(o.customer.notes) : ''}
+        ${o.customer.phone
+          ? `👤 ${esc(o.customer.name || 'לא צוין')} · 📞 <a href="tel:${esc(phoneDigits)}">${esc(o.customer.phone)}</a>
+             ${o.customer.notes ? '<br>📝 ' + esc(o.customer.notes) : ''}`
+          : '🔒 פרטי הלקוח נמחקו (הזמנה מלפני יותר משנה)'}
       </div>
       <div class="order-total">סה״כ: ${o.total} ₪</div>
       <select class="status-select" onchange="updateStatus('${o.id}', this.value)">
@@ -403,11 +445,64 @@ function renderStats(data){
       ${soldRows ? `<table class="stats-table">${soldRows}<tr><td>מתוכם במבצע</td><td class="num">${combos}</td></tr></table>` : '<div class="stats-note">עוד אין מכירות בתקופה הזו.</div>'}
       <div class="stats-note">נספרות רק הזמנות שנכנסו דרך האתר. שבוע = ראשון עד שבת. הזמנה שבוטלה לא נספרת במכירות.</div>
     </details>
+    ${insightsHtml(data.insights)}
+    ${monthsHtml(data.months)}
     <div class="backup-row">
       <span id="backupInfo">${backupInfoText(data.lastBackup)}</span>
       <button type="button" onclick="downloadBackup(this)">⬇️ הורדת גיבוי</button>
     </div>`;
   renderBackupAlert(data.lastBackup);
+}
+
+const MONTH_NAMES = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+const DAY_NAMES = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+
+function isOpen(id){ const el = document.getElementById(id); return !!(el && el.open); }
+
+// שורת עמודה אופקית: תווית, פס יחסי לערך הגבוה ביותר, ומספר
+function barRow(label, value, max, text, wide){
+  const pct = max ? Math.round(value / max * 100) : 0;
+  return `<div class="bar-row ${wide ? 'wide' : ''}"><span class="bar-label">${label}</span><span class="bar-track"><span class="bar-fill" style="width:${pct}%"></span></span><span class="bar-num">${text}</span></div>`;
+}
+
+function insightsHtml(ins){
+  if(!ins) return '';
+  let body;
+  if(!ins.orders){
+    body = '<div class="stats-note">עוד אין הזמנות בתקופה הזו.</div>';
+  } else {
+    const maxDay = Math.max(...ins.byWeekday.map(d => d.orders));
+    const hours = ins.byHour.map((n, h) => ({ h, n })).filter(x => x.n > 0);
+    const maxHour = Math.max(...hours.map(x => x.n));
+    body = `
+      <div class="stats-tiles" style="margin-top:8px">
+        <div class="stats-tile"><div class="label">הזמנה ממוצעת</div><div class="value">${Math.round(ins.revenue / ins.orders)} ₪</div></div>
+        <div class="stats-tile"><div class="label">בורקסים להזמנה</div><div class="value">${(ins.burekas / ins.orders).toFixed(1)}</div></div>
+      </div>
+      <div class="stats-sub">הזמנות לפי יום בשבוע</div>
+      ${ins.byWeekday.map((d, i) => barRow(DAY_NAMES[i], d.orders, maxDay, `${d.orders} · ${d.revenue} ₪`, true)).join('')}
+      <div class="stats-sub">הזמנות לפי שעה</div>
+      ${hours.map(x => barRow(String(x.h).padStart(2, '0') + ':00', x.n, maxHour, x.n)).join('')}
+      <div class="stats-note">${ins.orders} הזמנות ב-${ins.days} הימים האחרונים, בלי מבוטלות. השעה היא שעת קבלת ההזמנה באתר.</div>`;
+  }
+  return `<details id="insightsBox" ${isOpen('insightsBox') ? 'open' : ''}><summary>ניתוח ${ins.days} הימים האחרונים</summary>${body}</details>`;
+}
+
+function monthsHtml(months){
+  if(!months || !months.length) return '';
+  const byKey = Object.fromEntries(months.map(m => [m.month, m]));
+  const rows = months.map(m => {
+    const [y, mo] = m.month.split('-').map(Number);
+    const lastYear = byKey[`${y - 1}-${String(mo).padStart(2, '0')}`];
+    const cmp = lastYear ? `${lastYear.orders} · ${lastYear.revenue} ₪` : '—';
+    return `<tr><td>${MONTH_NAMES[mo - 1]} ${y}</td><td class="num">${m.orders}</td><td class="num">${m.revenue} ₪</td><td class="num">${cmp}</td></tr>`;
+  }).join('');
+  return `<details id="monthsBox" ${isOpen('monthsBox') ? 'open' : ''}><summary>לפי חודשים, מתחילת הדרך</summary>
+    <table class="stats-table">
+      <tr><th>חודש</th><th class="num">הזמנות</th><th class="num">מכירות</th><th class="num">אותו חודש אשתקד</th></tr>
+      ${rows}
+    </table>
+    <div class="stats-note">החודש הנוכחי עוד לא הסתיים, ולכן הוא חלקי.</div></details>`;
 }
 
 function backupInfoText(last){
