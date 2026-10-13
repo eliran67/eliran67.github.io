@@ -706,7 +706,9 @@ function setSync(st,txt){
   $('#syncTxt').textContent=txt||({local:'מקומי',ok:'מסונכרן',busy:'שומר…',err:'שגיאה',offline:'לא מקוון'}[st]);
 }
 function errMsg(status){return status===401?'פג תוקף הכניסה – צריך להתחבר מחדש':status===413?'נתוני המלאי גדולים מדי':status===429?'יותר מדי ניסיונות – נסה שוב בעוד כמה דקות':'שגיאת סנכרון'}
-const API_TIMEOUT_MS=10000;
+const API_TIMEOUT_MS=25000;              // ברשת סלולרית חלשה בקשה יכולה לקחת זמן
+const NET_RETRY_DELAYS=[3000,8000,20000]; // ניסיונות חוזרים אוטומטיים אחרי תקלת רשת
+let netRetry=0, netRetryTimer=null;
 async function api(path,opts={}){
   const ctrl=new AbortController();
   const timer=setTimeout(()=>ctrl.abort(),API_TIMEOUT_MS);
@@ -939,12 +941,20 @@ async function runSync({manual=false,adopt=false}={}){
     }
     saveJSON(LS_BASE,snap);                    // בענן יש עכשיו בדיוק את snap ← נקודת מוצא משותפת חדשה
     if(localRev===rev) localStorage.removeItem(LS_PENDING); else syncAgain=true; // נערך בזמן הכתיבה ← סבב נוסף
-    setSync('ok');
+    setSync('ok'); netRetry=0;
     if(msg) toast(msg); else if(manual) toast(mustPut||localChanged?'סונכרן':'הכל מעודכן');
     ensureDefaults();
   }catch(e){
     // מכשיר אחר שמר בין הקריאה לכתיבה: הנתונים במכשיר כבר נשמרו מקומית, מריצים סבב נוסף שימזג מול הגרסה החדשה
     if(e.status===409){syncAgain=true;setSync('busy','מסנכרן…');return}
+    // תקלת רשת (איטי מדי / אין חיבור): מנסים שוב לבד כמה פעמים לפני שמציגים שגיאה
+    if(!e.status&&netRetry<NET_RETRY_DELAYS.length){
+      const wait=NET_RETRY_DELAYS[netRetry++];
+      setSync('busy','מנסה שוב…');
+      clearTimeout(netRetryTimer);netRetryTimer=setTimeout(()=>sync(),wait);
+      return;
+    }
+    netRetry=0;
     setSync('err',e.status===401?'צריך להתחבר':undefined);toast(e.message);
   }   // הסימון "ממתין" נשאר ← ניסיון חוזר בחזרת חיבור, בחזרה לאפליקציה או בשמירה הבאה
 }
