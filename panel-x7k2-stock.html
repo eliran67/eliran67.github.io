@@ -886,6 +886,34 @@ function mergeStates(local,remote,base){
     defaultsV:Math.max(local.defaultsV,remote.defaultsV),updatedAt:Math.max(local.updatedAt,remote.updatedAt)};
 }
 
+// פריטים עם אותו שם (נוצרו בנפרד בשני מכשירים, כל אחד עם מזהה משלו) מתאחדים לפריט אחד.
+// נשאר תמיד המזהה הקטן ביותר, כדי שכל המכשירים יבחרו את אותו פריט; הכפולים נמחקים והתנועות שלהם עוברות אליו.
+function dedupeItems(st){
+  const groups=new Map();
+  for(const it of st.items){
+    const k=String(it.name||'').trim(); if(!k) continue;
+    if(!groups.has(k)) groups.set(k,[]);
+    groups.get(k).push(it);
+  }
+  const alias={}, now=Date.now(); let n=0;
+  for(const g of groups.values()){
+    if(g.length<2) continue;
+    g.sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0);
+    const keep=g[0];
+    for(const d of g.slice(1)){
+      keep.qty=Math.max(+keep.qty||0,+d.qty||0);
+      for(const f of ['min','price','notes','supplierId','exp']) if(!keep[f]&&d[f]) keep[f]=d[f];
+      if(d.firstTs) keep.firstTs=Math.min(keep.firstTs||Infinity,d.firstTs);
+      alias[d.id]=keep.id; st.tomb[d.id]=now; n++;
+    }
+    touch(keep);
+  }
+  if(!n) return 0;
+  st.items=st.items.filter(i=>!(i.id in alias));
+  for(const e of st.log) if(e.itemId in alias) e.itemId=alias[e.itemId];
+  return n;
+}
+
 function fingerprint(st){
   // בדיקת שוויון זולה, כדי לכתוב לענן רק כשהתוצאה הממוזגת באמת שונה ממה שיש בו.
   return JSON.stringify([st.epoch,st.coverDays,st.log.map(e=>e.id).sort(),
@@ -918,6 +946,7 @@ async function runSync({manual=false,adopt=false}={}){
     const remote=normalize(got.data); remoteVersion=+got.version||0;
     let base=loadJSON(LS_BASE,null); if(base&&base.binId!==SERVER_ID) base=null;
     const remoteEmpty=!remote.items.length&&!remote.log.length;
+    const remoteFp=fingerprint(remote);        // לפני המיזוג: איחוד הכפולים למטה עלול לשנות את remote עצמו
     let next,msg='';
     // המיזוג רץ מול S הנוכחי, כך שעריכות שנעשו בזמן הקריאה מהענן נכללות.
     if(adopt&&!base) next=remoteEmpty?S:remote;              // מכשיר שמצטרף ל-Bin קיים
@@ -929,9 +958,11 @@ async function runSync({manual=false,adopt=false}={}){
     else if(!base&&remoteEmpty) next=S;
     else next=pruneState(mergeStates(S,remote,base&&base.epoch===remote.epoch?base:null));
 
+    const dups=dedupeItems(next);
+    if(dups&&!msg) msg=`אוחדו ${dups} פריטים כפולים`;
     if(next!==S&&fingerprint(next)===fingerprint(S)) next=S; // לא השתנה כלום – משאירים את אותו אובייקט
-    const localChanged=next!==S;
-    const mustPut=fingerprint(next)!==fingerprint(remote);
+    const localChanged=next!==S||dups>0;
+    const mustPut=fingerprint(next)!==remoteFp;
     const rev=localRev;
     const snap=makeBase(next);                 // צילום לפני הכתיבה: עריכות מאוחרות יותר לא אמורות לזלוג לנקודת המוצא
     S=next;
