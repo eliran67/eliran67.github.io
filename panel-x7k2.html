@@ -276,14 +276,35 @@ function renderOrders(){
   }).join('');
 }
 
+// הודעה קצרה על מה שקרה במלאי אחרי שינוי סטטוס ("הושלמה" מוריד מהמלאי, ביטול שלו מחזיר)
+function showStockNote(stock){
+  if(!stock) return;
+  let msg = '';
+  if(stock.deducted) msg = `📦 ירד מהמלאי (${stock.deducted} פריטים)`;
+  else if(stock.restored) msg = `📦 הוחזר למלאי (${stock.restored} פריטים)`;
+  else if(stock.skipped === 'no-inventory') msg = '📦 המלאי עוד לא הופעל - כדי שהזמנות יורידו ממנו, היכנס פעם אחת לאפליקציית המלאי';
+  else if(stock.error) msg = '⚠️ הסטטוס עודכן, אבל עדכון המלאי נכשל. נסה לשנות שוב';
+  if(!msg) return;
+  let el = document.getElementById('stockNote');
+  if(!el){
+    el = document.createElement('div'); el.id = 'stockNote'; el.setAttribute('role','status');
+    el.style.cssText = 'position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#2E1B12;color:#FBF3E7;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:600;z-index:50;max-width:92vw;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.25)';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg; el.style.display = 'block';
+  clearTimeout(el._t); el._t = setTimeout(() => { el.style.display = 'none'; }, 3500);
+}
+
 async function updateStatus(id, status){
   const token = getToken();
   try{
-    await fetch(API_URL + '/api/admin/orders/' + id, {
+    const res = await fetch(API_URL + '/api/admin/orders/' + id, {
       method:'PATCH',
       headers:{'Content-Type':'application/json', 'Authorization':'Bearer ' + token},
       body: JSON.stringify({ status })
     });
+    const data = await res.json().catch(() => ({}));
+    showStockNote(data.stock);
     loadOrders();
   } catch(e){
     alert('עדכון הסטטוס נכשל, נסה שוב');
