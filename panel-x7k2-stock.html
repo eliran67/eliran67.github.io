@@ -194,12 +194,12 @@ const UNITS=['יח׳','ק״ג','גרם','ליטר','מגש','קרטון','חבי
 const TYPES=['product','raw','pack'];
 const TYPE_LABEL={product:'מוצרים מוכנים',raw:'חומרי גלם',pack:'אריזה וכלים'};
 const TYPE_SHORT={product:'מוצרים',raw:'חומרי גלם',pack:'אריזה',all:'הכל'};
-const DEFAULTS_V=5; // גרסה 5: נוספה טרופית
+const DEFAULTS_V=6; // גרסה 5: נוספה טרופית · גרסה 6: טרופית עברה לחומרי גלם
 // שמות שהשתנו (גרסה 4): כדי להתאים לשמות באתר. פריט קיים בשם הישן מקבל את השם החדש במקום שיתווסף כפול.
 const RENAMED_ITEMS={'בורקס תרד':'בורקס גבינה ותרד','בורקס פטריות':'בורקס תפו״א ופטריות'};
 const REMOVED_RAWS=['בצק עלים','גבינה בולגרית','תפוחי אדמה','פטריות','תרד','שומשום'];
 const DEFAULT_ITEMS=[
-  ['product','בורקס גבינה','יח׳'],['product','בורקס גבינה ותרד','יח׳'],['product','בורקס תפוחי אדמה','יח׳'],['product','בורקס תפו״א ופטריות','יח׳'],['product','טרופית','יח׳'],
+  ['product','בורקס גבינה','יח׳'],['product','בורקס גבינה ותרד','יח׳'],['product','בורקס תפוחי אדמה','יח׳'],['product','בורקס תפו״א ופטריות','יח׳'],['raw','טרופית','יח׳'],
   ['raw','ביצים','יח׳'],['raw','מלפפון חמוץ','צנצנת'],
   ['pack','צלחות','יח׳'],['pack','נייר פרגמנט','גליל'],['pack','כוסיות לרסק','יח׳'],['pack','כוסיות לחריף','יח׳'],['pack','סכו״ם','סט']
 ];
@@ -657,6 +657,7 @@ function ensureDefaults(){
   if((S.defaultsV||0)>=DEFAULTS_V) return;
   if((S.defaultsV||0)>=2) S.items=S.items.filter(i=>{const gone=i.type==='raw'&&REMOVED_RAWS.includes(i.name);if(gone)tombstone(i.id);return !gone});
   if((S.defaultsV||0)<4) S.items.forEach(i=>{const nn=RENAMED_ITEMS[i.name];if(nn&&!S.items.some(x=>x.name===nn)){i.name=nn;touch(i)}});
+  if((S.defaultsV||0)<6) S.items.forEach(i=>{if(i.name==='טרופית'&&i.type!=='raw'){i.type='raw';touch(i)}});
   const n=addDefaults(); commit(); if(n) toast(`נוספו ${n} פריטים בסיסיים למלאי`);
 }
 function seed(){const n=addDefaults();commit();toast(n?`נוספו ${n} פריטים`:'כל הפריטים הבסיסיים כבר קיימים')}
