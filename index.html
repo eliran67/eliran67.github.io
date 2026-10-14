@@ -489,6 +489,20 @@
   .faq-list summary::after{content:"+"; font-size:18px; color:var(--terracotta); flex:none;}
   .faq-list details[open] summary::after{content:"−";}
   .faq-list details p{font-size:13.5px; color:#6b5644; line-height:1.7; margin-top:10px;}
+  .faq-card{
+    display:flex; align-items:center; gap:12px; width:100%; max-width:560px; margin:0 auto;
+    background:#fff; border:1.5px solid var(--line); border-radius:14px; padding:14px 16px;
+    text-align:right; color:var(--ink); cursor:pointer; font-family:inherit;
+  }
+  .faq-card:hover, .faq-card:focus-visible{border-color:var(--gold);}
+  .faq-card-icon{font-size:22px; flex:none;}
+  .faq-card-text{flex:1; display:flex; flex-direction:column; gap:2px;}
+  .faq-card-title{font-size:15.5px; font-weight:800;}
+  .faq-card-sub{font-size:12.5px; color:#8a7461;}
+  .faq-card-arrow{font-size:24px; line-height:1; color:var(--gold); flex:none;}
+  .modal-head .modal-title{font-size:18px; font-weight:800; color:var(--coffee-2);}
+  .faq-body h3{font-size:14.5px; font-weight:800; color:var(--coffee-2); margin:14px 0 4px;}
+  .faq-body h3:first-child{margin-top:0;}
 
   /* =====================================================================
      עיצוב בהשראת הפלאייר: רקע שמנת, טקסט חום כהה, הדגשות בזהב
@@ -771,42 +785,16 @@
   </form>
 </section>
 
-<section class="faq" id="faq" aria-labelledby="faq-title">
-  <div class="menu-head">
-    <span class="eyebrow">שאלות נפוצות</span>
-    <h2 id="faq-title">כל מה שרציתם לדעת על בורקס עמקה</h2>
-  </div>
-  <!-- התשובות כאן מופיעות גם ב-JSON-LD (FAQPage) בסוף הקובץ - אם משנים פה, לעדכן גם שם -->
-  <div class="faq-list">
-    <details>
-      <summary>איפה נמצא בורקס עמקה?</summary>
-      <p>ברחוב הכרם 48 ביישוב עמקה. אפשר לנווט אלינו ישירות ב-Waze מהכפתור שבתפריט.</p>
-    </details>
-    <details>
-      <summary>מה שעות הפעילות?</summary>
-      <p>אנחנו פתוחים בימים א׳-ה׳ בין 09:00 ל-21:00. כדאי להזמין לפחות שעה מראש כדי שהבורקס ייצא חם מהתנור בדיוק בזמן.</p>
-    </details>
-    <details>
-      <summary>איך מזמינים בורקס?</summary>
-      <p>בונים את המגש כאן באתר ולוחצים על "לשלוח את ההזמנה החמה בוואטסאפ", ונפתחת הודעה מוכנה. אפשר גם להתקשר אלינו: 054-9073509.</p>
-    </details>
-    <details>
-      <summary>כמה עולה בורקס?</summary>
-      <p>כל בורקס עולה 25 ₪. תוספת ביצה או טרופית עולה 3 ₪, ומבצע של בורקס עם ביצה וטרופית עולה 30 ₪.</p>
-    </details>
-    <details>
-      <summary>אילו סוגי בורקס יש?</summary>
-      <p>גבינה · גבינה ותרד · תפוחי אדמה · תפו״א ופטריות - כולם בבצק עלים פריך שנאפה במקום.</p>
-    </details>
-    <details>
-      <summary>האם הבורקס כשר?</summary>
-      <p>כן, הבורקסים בכשרות בד״ץ בית יוסף.</p>
-    </details>
-    <details>
-      <summary>איך משלמים?</summary>
-      <p>אפשר לשלם בביט, בפייבוקס או במזומן.</p>
-    </details>
-  </div>
+<!-- השאלות עצמן נמצאות בחלון modal-faq (בתחתית הקובץ). הן בקוד הדף כל הזמן, ולכן גוגל ממשיך לקרוא אותן -->
+<section class="faq" id="faq" aria-label="שאלות נפוצות">
+  <button type="button" class="faq-card" data-open-modal="modal-faq">
+    <span class="faq-card-icon" aria-hidden="true">❓</span>
+    <span class="faq-card-text">
+      <span class="faq-card-title">שאלות נפוצות</span>
+      <span class="faq-card-sub">איפה, מתי, כמה עולה, כשר, איך משלמים</span>
+    </span>
+    <span class="faq-card-arrow" aria-hidden="true">‹</span>
+  </button>
 </section>
 </main>
 
@@ -834,6 +822,8 @@
   </div>
 
   <div class="legal-links">
+    <button type="button" class="legal-link" data-open-modal="modal-faq">שאלות נפוצות</button>
+    <span class="legal-sep" aria-hidden="true">·</span>
     <button type="button" class="legal-link" data-open-modal="modal-privacy">מדיניות פרטיות</button>
     <span class="legal-sep" aria-hidden="true">·</span>
     <button type="button" class="legal-link" data-open-modal="modal-accessibility">הצהרת נגישות</button>
@@ -887,6 +877,30 @@
 </script>
 
 <div class="modal-overlay" id="modal-overlay" hidden></div>
+
+<!-- שאלות נפוצות: כל התשובות פתוחות בחלון אחד. מופיעות גם ב-JSON-LD (FAQPage) בסוף הקובץ - אם משנים פה, לעדכן גם שם -->
+<div class="modal" id="modal-faq" role="dialog" aria-modal="true" aria-labelledby="modal-faq-title" hidden>
+  <div class="modal-head">
+    <h2 id="modal-faq-title" class="modal-title">כל מה שרציתם לדעת על בורקס עמקה</h2>
+    <button type="button" class="modal-close" data-close-modal aria-label="סגירת חלון השאלות הנפוצות">✕</button>
+  </div>
+  <div class="modal-body faq-body">
+    <h3>איפה נמצא בורקס עמקה?</h3>
+    <p>ברחוב הכרם 48 ביישוב עמקה. אפשר לנווט אלינו ישירות ב-Waze מהכפתור שבתפריט.</p>
+    <h3>מה שעות הפעילות?</h3>
+    <p>אנחנו פתוחים בימים א׳-ה׳ בין 09:00 ל-21:00. כדאי להזמין לפחות שעה מראש כדי שהבורקס ייצא חם מהתנור בדיוק בזמן.</p>
+    <h3>איך מזמינים בורקס?</h3>
+    <p>בונים את המגש כאן באתר ולוחצים על "לשלוח את ההזמנה החמה בוואטסאפ", ונפתחת הודעה מוכנה. אפשר גם להתקשר אלינו: <a href="tel:0549073509">054-9073509</a>.</p>
+    <h3>כמה עולה בורקס?</h3>
+    <p>כל בורקס עולה 25 ₪. תוספת ביצה או טרופית עולה 3 ₪, ומבצע של בורקס עם ביצה וטרופית עולה 30 ₪.</p>
+    <h3>אילו סוגי בורקס יש?</h3>
+    <p>גבינה · גבינה ותרד · תפוחי אדמה · תפו״א ופטריות - כולם בבצק עלים פריך שנאפה במקום.</p>
+    <h3>האם הבורקס כשר?</h3>
+    <p>כן, הבורקסים בכשרות בד״ץ בית יוסף.</p>
+    <h3>איך משלמים?</h3>
+    <p>אפשר לשלם בביט, בפייבוקס או במזומן.</p>
+  </div>
+</div>
 
 <!-- מדיניות פרטיות: מתארת מה האתר באמת עושה עם המידע. אם משנים את אופן שליחת/שמירת ההזמנות - לעדכן גם כאן -->
 <div class="modal" id="modal-privacy" role="dialog" aria-modal="true" aria-labelledby="modal-privacy-title" hidden>
