@@ -451,7 +451,7 @@ function renderStats(data){
       </table>
       <div class="stats-sub">מה נמכר ב-4 השבועות האחרונים</div>
       ${soldRows ? `<table class="stats-table">${soldRows}<tr><td>מתוכם במבצע</td><td class="num">${combos}</td></tr></table>` : '<div class="stats-note">עוד אין מכירות בתקופה הזו.</div>'}
-      <div class="stats-note">נספרות רק הזמנות שנכנסו דרך האתר. שבוע = ראשון עד שבת. הזמנה שבוטלה לא נספרת במכירות.</div>
+      <div class="stats-note">נספרות כל ההזמנות: מהאתר ומהבוט (טלפון, וואטסאפ, אינסטגרם, במקום). שבוע = ראשון עד שבת. הזמנה שבוטלה לא נספרת במכירות.</div>
     </details>
     ${insightsHtml(data.insights)}
     ${monthsHtml(data.months)}
@@ -491,7 +491,7 @@ function insightsHtml(ins){
       ${ins.byWeekday.map((d, i) => barRow(DAY_NAMES[i], d.orders, maxDay, `${d.orders} · ${d.revenue} ₪`, true)).join('')}
       <div class="stats-sub">הזמנות לפי שעה</div>
       ${hours.map(x => barRow(String(x.h).padStart(2, '0') + ':00', x.n, maxHour, x.n)).join('')}
-      <div class="stats-note">${ins.orders} הזמנות ב-${ins.days} הימים האחרונים, בלי מבוטלות. השעה היא שעת קבלת ההזמנה באתר.</div>`;
+      <div class="stats-note">${ins.orders} הזמנות ב-${ins.days} הימים האחרונים, בלי מבוטלות. השעה היא השעה שבה ההזמנה נרשמה.</div>`;
   }
   return `<details id="insightsBox" ${isOpen('insightsBox') ? 'open' : ''}><summary>ניתוח ${ins.days} הימים האחרונים</summary>${body}</details>`;
 }
