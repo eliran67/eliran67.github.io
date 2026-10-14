@@ -192,6 +192,7 @@
 const API_URL = 'https://api.burekas-amka.co.il';
 
 let STATUSES = ['חדשה','בטיפול','מוכנה','הושלמה','בוטלה']; // מתעדכן מהשרת
+const SOURCE_ICONS = { 'אתר':'🌐', 'טלפון':'📞', 'וואטסאפ':'💬', 'אינסטגרם':'📸', 'במקום':'🏪' };
 let currentFilter = 'הכל';
 let allOrders = [];
 let pollTimer = null;
@@ -326,21 +327,28 @@ function renderOrders(){
     let itemsHtml = o.items.map(it => `${esc(it.name)} × ${it.qty} — ${it.qty * it.price} ₪`).join('<br>');
     if(o.comboCount > 0) itemsHtml += `<br>מבצע × ${o.comboCount} — -${o.discount} ₪`;
     const phoneDigits = String(o.customer.phone || '').replace(/[^\d+]/g, '');
+    // מאיפה ההזמנה: "אתר", או מקור שנבחר בהזמנה ידנית בבוט הטלגרם
+    const source = o.source || 'אתר';
+    const sourceLabel = `${SOURCE_ICONS[source] || ''} ${esc(source)}`;
+    // הזמנה ידנית יכולה להישמר בלי שם ובלי טלפון; רק בהזמנה מהאתר זה אומר שהפרטים נמחקו אחרי שנה
+    const hasCustomer = o.customer.phone || o.customer.name || o.customer.notes;
+    const custHtml = o.customer.phone
+      ? `👤 ${esc(o.customer.name || 'לא צוין')} · 📞 <a href="tel:${esc(phoneDigits)}">${esc(o.customer.phone)}</a>`
+      : `👤 ${esc(o.customer.name || 'לא צוין')}`;
 
     return `
     <div class="order-card">
       <div class="order-top">
         <div>
           <div class="order-num">#${esc(o.orderNum)}</div>
-          <div class="order-time">${time}</div>
+          <div class="order-time">${time} · ${sourceLabel}</div>
         </div>
         <div class="status-badge status-${esc(o.status)}">${esc(o.status)}</div>
       </div>
       <div class="order-items">${itemsHtml}</div>
       <div class="order-cust">
-        ${o.customer.phone
-          ? `👤 ${esc(o.customer.name || 'לא צוין')} · 📞 <a href="tel:${esc(phoneDigits)}">${esc(o.customer.phone)}</a>
-             ${o.customer.notes ? '<br>📝 ' + esc(o.customer.notes) : ''}`
+        ${hasCustomer || source !== 'אתר'
+          ? `${custHtml}${o.customer.notes ? '<br>📝 ' + esc(o.customer.notes) : ''}`
           : '🔒 פרטי הלקוח נמחקו (הזמנה מלפני יותר משנה)'}
       </div>
       <div class="order-total">סה״כ: ${o.total} ₪</div>
