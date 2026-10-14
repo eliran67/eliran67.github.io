@@ -604,7 +604,7 @@ document.addEventListener('click',e=>{
     case 'edit': editItem(id); break;
     case 'adjust': adjustItem(id); break;
     case 'inc': case 'dec': {const it=byId(id);if(!it)break;if(act==='dec'&&it.qty<=0){toast('הכמות כבר 0');break}
-      applyDelta(it,act==='inc'?1:-1,'עדכון מהיר','');commit(true);patchItemRow(it,act);break}
+      applyDelta(it,act==='inc'?1:-1,act==='inc'?'עדכון מהיר':it.type==='product'?'מכירה':'שימוש',act==='inc'?'':'ידני');commit(true);patchItemRow(it,act);break}
     case 'incPack': {const it=byId(id);if(!it)break;applyDelta(it,+it.pack,'קבלת סחורה','קרטון');commit(true);patchItemRow(it,act);toast(`נוסף קרטון: ${fmt(it.pack)} ${it.unit}`);break}
     case 'exportCSV': exportCSV(); break;
     case 'seed': seed(); break;
