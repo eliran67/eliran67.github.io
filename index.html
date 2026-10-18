@@ -1318,6 +1318,18 @@ function scrollToId(id){
     window.location.href = url;
   });
 
+  // שעת איסוף מהזמנה קודמת לא רלוונטית להזמנה חדשה: מורידים מההערות כל חלק שמדבר על שעה.
+  // חלק = מה שבין פסיקים, או לפני "בלי"/"עם"/"ללא"/"תודה" (כדי ש"איסוף 12:30 בלי חריף" ישאיר את "בלי חריף")
+  var PICKUP_TIME_RE = /\d{1,2}\s*[:.]\s*\d{2}|(^|\s)[בלו]?(שעה|שעת|שעות|איסוף|לאיסוף|אאסוף|נאסוף|אגיע|נגיע|בוקר|צהריים|צהרים|אחה"צ|אחה״צ|ערב)(?=\s|$)|(^|\s)ב-?\s?([7-9]|1\d|2[0-3])(\s|$)/;
+  function removePickupTime(notes){
+    var parts = notes.split(/[,،;\n]|\s+(?=(?:בלי|עם|ללא|תודה)(?:\s|$))/)
+      .map(function(part){ return part.trim(); })
+      .filter(Boolean);
+    var kept = parts.filter(function(part){ return !PICKUP_TIME_RE.test(part); });
+    // אם אין שעה בהערות, מחזירים אותן בדיוק כמו שנכתבו
+    return kept.length === parts.length ? notes : kept.join(', ');
+  }
+
   restoreBtn.addEventListener('click', function(){
     try{
       var lastOrderRaw = localStorage.getItem(LAST_ORDER_KEY);
@@ -1327,7 +1339,7 @@ function scrollToId(id){
         var qty = parseInt(lastOrder[key], 10);
         STATE[key] = (!isNaN(qty) && qty > 0) ? clamp(qty) : 0;
       });
-      if(typeof lastOrder.notes === 'string'){ notesInput.value = lastOrder.notes.slice(0, 80); }
+      if(typeof lastOrder.notes === 'string'){ notesInput.value = removePickupTime(lastOrder.notes).slice(0, 80); }
       steppers.forEach(function(stepperEl){
         updateStepperDisplay(stepperEl, stepperEl.getAttribute('data-item'));
       });
