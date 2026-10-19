@@ -106,6 +106,24 @@
     font-family:inherit; font-size:13px; background:#fff;
   }
 
+  .delete-btn{
+    display:block; margin:10px auto 0; background:none; color:#a0533a; font-size:12px; font-weight:600;
+    padding:4px 8px; border-radius:8px;
+  }
+  .delete-btn:hover{background:#fbe9e2;}
+  .del-overlay{position:fixed; inset:0; background:rgba(46,27,18,.45); display:flex; align-items:center; justify-content:center; z-index:60; padding:16px;}
+  .del-overlay[hidden]{display:none;}
+  .del-box{background:#fff; border-radius:16px; padding:18px; width:100%; max-width:340px; box-shadow:0 10px 30px rgba(0,0,0,.25);}
+  .del-box h2{font-size:16px; color:var(--coffee-2); margin-bottom:6px;}
+  .del-box p{font-size:12.5px; color:#6b5644; line-height:1.6; margin-bottom:12px;}
+  .del-box input{width:100%; padding:10px; border-radius:10px; border:1.5px solid var(--line); font-family:inherit; font-size:14px;}
+  .del-box .del-err{color:var(--terracotta); font-size:12.5px; min-height:18px; margin-top:6px;}
+  .del-box .del-actions{display:flex; gap:8px; margin-top:8px;}
+  .del-box .del-actions button{flex:1; padding:10px; border-radius:10px; font-family:inherit; font-size:13.5px; font-weight:700;}
+  .del-box .del-confirm{background:#b5442a; color:#fff;}
+  .del-box .del-confirm:disabled{opacity:.6;}
+  .del-box .del-cancel{background:var(--cream); color:var(--coffee-2);}
+
   .refresh-note{text-align:center; font-size:11.5px; color:#8a7461; margin-top:14px;}
 
   .backup-alert{
@@ -185,6 +203,20 @@
       </div>
     </div>
   </main>
+</div>
+
+<div class="del-overlay" id="delOverlay" hidden onclick="if(event.target === this) closeDelete()">
+  <div class="del-box" role="dialog" aria-modal="true" aria-labelledby="delTitle">
+    <h2 id="delTitle">למחוק את ההזמנה?</h2>
+    <p>ההזמנה והפרטים שלה יימחקו לגמרי, ואי אפשר לבטל. <b>המלאי לא ישתנה.</b><br>כדי לאשר, הזן את הקוד של לוח הבקרה:</p>
+    <input type="password" id="delPw" placeholder="••••••" autocomplete="off"
+      onkeydown="if(event.key === 'Enter') confirmDelete(); if(event.key === 'Escape') closeDelete();">
+    <div class="del-err" id="delErr" role="alert"></div>
+    <div class="del-actions">
+      <button type="button" class="del-confirm" id="delConfirm" onclick="confirmDelete()">מחיקה</button>
+      <button type="button" class="del-cancel" onclick="closeDelete()">ביטול</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -355,6 +387,7 @@ function renderOrders(){
       <select class="status-select" onchange="updateStatus('${o.id}', this.value)">
         ${STATUSES.map(s => `<option value="${s}" ${s===o.status?'selected':''}>${s}</option>`).join('')}
       </select>
+      <button type="button" class="delete-btn" onclick="openDelete('${esc(o.id)}', '${esc(o.orderNum)}')">🗑 מחיקת הזמנה</button>
     </div>`;
   }).join('');
 }
@@ -367,6 +400,11 @@ function showStockNote(stock){
   else if(stock.restored) msg = `📦 הוחזר למלאי (${stock.restored} פריטים)`;
   else if(stock.skipped === 'no-inventory') msg = '📦 המלאי עוד לא הופעל - כדי שהזמנות יורידו ממנו, היכנס פעם אחת לאפליקציית המלאי';
   else if(stock.error) msg = '⚠️ הסטטוס עודכן, אבל עדכון המלאי נכשל. נסה לשנות שוב';
+  showNote(msg);
+}
+
+// הודעה קצרה בתחתית המסך
+function showNote(msg){
   if(!msg) return;
   let el = document.getElementById('stockNote');
   if(!el){
@@ -395,6 +433,48 @@ async function updateStatus(id, status){
   }
 }
 
+/* ===== מחיקת הזמנה: רק עם סיסמת הניהול, ובלי לגעת במלאי ===== */
+let deleteTarget = null;
+
+function openDelete(id, orderNum){
+  deleteTarget = id;
+  document.getElementById('delTitle').textContent = `למחוק את הזמנה #${orderNum}?`;
+  document.getElementById('delPw').value = '';
+  document.getElementById('delErr').textContent = '';
+  document.getElementById('delConfirm').disabled = false;
+  document.getElementById('delOverlay').hidden = false;
+  document.getElementById('delPw').focus();
+}
+
+function closeDelete(){
+  deleteTarget = null;
+  document.getElementById('delOverlay').hidden = true;
+}
+
+async function confirmDelete(){
+  const pw = document.getElementById('delPw').value;
+  const errEl = document.getElementById('delErr');
+  const btn = document.getElementById('delConfirm');
+  if(!pw){ errEl.textContent = 'צריך להזין את הקוד'; return; }
+  btn.disabled = true; errEl.textContent = '';
+  try{
+    const res = await fetch(API_URL + '/api/admin/orders/' + encodeURIComponent(deleteTarget) + '/delete', {
+      method:'POST',
+      headers:{'Content-Type':'application/json', 'Authorization':'Bearer ' + getToken()},
+      body: JSON.stringify({ password: pw })
+    });
+    const data = await res.json().catch(() => ({}));
+    if(res.status === 401){ closeDelete(); logout(); return; }
+    if(res.status === 404){ closeDelete(); showNote('ההזמנה כבר נמחקה'); loadOrders(); loadStats(); return; }
+    if(!res.ok){ errEl.textContent = data.error || 'המחיקה נכשלה, נסה שוב'; btn.disabled = false; return; }
+    closeDelete();
+    showNote('🗑 ההזמנה נמחקה. המלאי לא השתנה');
+    loadOrders();
+    loadStats();
+  } catch(e){
+    errEl.textContent = 'שגיאת רשת, נסה שוב'; btn.disabled = false;
+  }
+}
 
 /* ===== המספרים: סיכום שבועי + גיבוי ===== */
 const BACKUP_WARN_DAYS = 10; // הגיבוי האוטומטי רץ פעם בשבוע; אחרי 10 ימים בלי גיבוי מציגים תזכורת
