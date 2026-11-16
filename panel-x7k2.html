@@ -92,6 +92,10 @@
     padding:10px 12px; font-size:12.5px; line-height:1.6; margin-bottom:14px;
   }
   .email-alert:empty{display:none;}
+  .tg-flag{
+    display:inline-block; background:#FDECEA; color:#8c1d18; border:1px solid #f3b8b3; border-radius:8px;
+    padding:3px 8px; font-size:12px; font-weight:700; margin:6px 0 2px;
+  }
   .email-alert code{direction:ltr; unicode-bidi:embed; font-size:11.5px; word-break:break-word;}
   .order-cust a{color:var(--terracotta); font-weight:700;}
 
@@ -185,6 +189,7 @@
     </div>
   </header>
   <main>
+    <div class="email-alert" id="tgAlert" role="alert"></div>
     <div class="email-alert" id="emailAlert" role="alert"></div>
     <div class="backup-alert" id="backupAlert" role="status"></div>
     <!-- בטלפון: שתי לשוניות. במסך רחב: שתי עמודות זו לצד זו, והלשוניות מוסתרות -->
@@ -332,6 +337,7 @@ async function loadOrders(){
 
     renderEmailAlert(data.lastEmail);
     renderOrders();
+    renderTelegramAlert();
   } catch(e){
     // שקט - ננסה שוב בפעם הבאה
   }
@@ -343,6 +349,17 @@ function renderEmailAlert(lastEmail){
   const when = new Date(lastEmail.at).toLocaleString('he-IL', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'});
   el.innerHTML = `⚠️ המייל על הזמנה #${esc(lastEmail.orderNum)} (${when}) לא נשלח. ההזמנה עצמה נשמרה כאן.<br>
     הסיבה מ-EmailJS: <code>${esc(lastEmail.error)}</code>`;
+}
+
+// הזמנות פתוחות שההודעה עליהן לא הגיעה לקבוצת הטלגרם (השרת ניסה פעמיים). מוצג מעל אזהרת המייל, באותו מקום
+const OPEN_STATUSES = ['חדשה', 'בטיפול', 'מוכנה'];
+function telegramFailedOpen(o){ return o.telegramFailed && OPEN_STATUSES.includes(o.status); }
+function renderTelegramAlert(){
+  const el = document.getElementById('tgAlert');
+  const failed = allOrders.filter(telegramFailedOpen);
+  el.innerHTML = failed.length
+    ? `⚠️ ההודעה לקבוצת הטלגרם לא נשלחה על ${failed.length === 1 ? 'הזמנה' : 'ההזמנות'} ${failed.map(o => '#' + esc(o.orderNum)).join(', ')}. ההזמנה שמורה כאן, אבל בקבוצה לא רואים אותה.`
+    : '';
 }
 
 function renderOrders(){
@@ -377,6 +394,7 @@ function renderOrders(){
         </div>
         <div class="status-badge status-${esc(o.status)}">${esc(o.status)}</div>
       </div>
+      ${telegramFailedOpen(o) ? '<div class="tg-flag">⚠️ לא נשלחה הודעה לקבוצה</div>' : ''}
       <div class="order-items">${itemsHtml}</div>
       <div class="order-cust">
         ${hasCustomer || source !== 'אתר'
