@@ -357,12 +357,22 @@ function render(){
 function safeRender(){render()}
 
 function visibleItems(){return S.items.filter(i=>(filter==='all'||i.type===filter)&&(!query||i.name.includes(query)))}
+function unsyncedAge(){
+  // T-30: גיל התנועה הכי ישנה שעדיין לא עלתה לענן – כדי להתריע אם שינויים "תקועים" מקומית
+  if(!cfgOK()) return 0;
+  const base=loadJSON(LS_BASE,null);
+  const synced=base&&base.binId===SERVER_ID&&Array.isArray(base.ids)?new Set(base.ids):new Set();
+  let oldest=0;
+  for(const e of S.log) if(!synced.has(e.id)) oldest=oldest?Math.min(oldest,e.ts):e.ts;
+  return oldest?Date.now()-oldest:0;
+}
 function stockSummary(list){
   const low=list.filter(isLow).length, exp=list.filter(isExpiring).length;
   const value=list.reduce((s,i)=>s+(+i.price||0)*i.qty,0);
   return `<span class="pill"><b>${list.length}</b> פריטים</span>
     ${low?`<span class="pill alert"><b>${low}</b> מתחת למינימום</span>`:''}
     ${exp?`<span class="pill warn"><b>${exp}</b> לפני תפוגה</span>`:''}
+    ${unsyncedAge()>2*864e5?`<span class="pill warn"><b>שימו לב</b> שינויים לא נשמרו בענן</span>`:''}
     ${value&&!ui.simple?`<span class="pill">שווי <b>${money(value)}</b></span>`:''}`;
 }
 function renderStock(){
@@ -434,13 +444,14 @@ function renderShop(){
 
 /* ----- יומן וסטטיסטיקה ----- */
 function renderLog(){
-  const m0=new Date();m0.setDate(1);m0.setHours(0,0,0,0);
-  const spend=S.log.filter(e=>e.ts>=m0&&e.cost).reduce((s,e)=>s+e.cost,0);
+  // T-31: היומן נשמר רק LOG_KEEP_DAYS ימים, אז "החודש" הציג סכום חלקי מאמצע החודש. מציגים את מה שבאמת קיים ביומן.
+  const spendFrom=Date.now()-LOG_KEEP_DAYS*864e5;
+  const spend=S.log.filter(e=>e.ts>=spendFrom&&e.cost).reduce((s,e)=>s+e.cost,0);
   const value=S.items.reduce((s,i)=>s+(+i.price||0)*i.qty,0);
   const w0=Date.now()-7*864e5, sold={};
   S.log.forEach(e=>{const it=byId(e.itemId);if(it&&it.type==='product'&&e.ts>=w0&&e.delta<0&&!NOT_CONSUMPTION.includes(e.reason))sold[it.id]=(sold[it.id]||0)-e.delta});
   const top=Object.entries(sold).sort((a,b)=>b[1]-a[1]);
-  let h=ui.simple?'':`<div class="stats"><div class="stat"><b>${money(spend)}</b><span>קניות סחורה החודש</span></div><div class="stat"><b>${money(value)}</b><span>שווי המלאי כרגע</span></div></div>`;
+  let h=ui.simple?'':`<div class="stats"><div class="stat"><b>${money(spend)}</b><span>קניות סחורה · ${LOG_KEEP_DAYS} ימים</span></div><div class="stat"><b>${money(value)}</b><span>שווי המלאי כרגע</span></div></div>`;
   if(top.length) h+=`<div class="panel"><h2>יצא ב-7 הימים האחרונים</h2><ul class="shop">${top.map(([id,n])=>`<li><span>${esc(byId(id).name)}</span><span>${fmt(n)} ${esc(byId(id).unit)}</span></li>`).join('')}</ul></div>`;
   if(!S.log.length) return h+`<div class="empty"><p>עוד אין תנועות. כל שינוי במלאי יירשם כאן.</p></div>`;
   const rows=S.log.slice(-300).reverse(); let day='';
@@ -770,9 +781,13 @@ function pruneState(st,now=Date.now()){
   const first={};
   for(const e of st.log) if(!(e.itemId in first)||e.ts<first[e.itemId]) first[e.itemId]=e.ts;
   for(const it of st.items) it.firstTs=Math.min(it.firstTs||now,first[it.id]??now);
-  // חיתוך לפי גיל בלבד: אף פעם לא מוחקים משהו בתוך חלון חישוב הקצב, לא משנה כמה רשומות יש.
+  // חיתוך לפי גיל, אבל אף פעם לא מוחקים תנועה שעדיין לא עלתה לענן (T-30): אם היא תיחתך,
+  // המיזוג יחשב "נקודת המוצא + תנועות שלא נראו" בלעדיה, והכמות תקפוץ לערך שגוי.
+  // "עלתה לענן" = נכללת בנקודת המוצא השמורה. בלי סנכרון (מכשיר מקומי) אין מיזוג, אז חותכים לפי גיל כרגיל.
   const cutoff=now-LOG_KEEP_DAYS*864e5;
-  st.log=st.log.filter(e=>e.ts>=cutoff);
+  let synced=null;
+  if(cfgOK()){const base=loadJSON(LS_BASE,null);synced=base&&base.binId===SERVER_ID&&Array.isArray(base.ids)?new Set(base.ids):new Set()}
+  st.log=st.log.filter(e=>e.ts>=cutoff||(synced&&!synced.has(e.id)));
   const tCut=now-TOMB_KEEP_DAYS*864e5;
   for(const id in st.tomb) if(st.tomb[id]<tCut) delete st.tomb[id];
   return st;
@@ -949,7 +964,13 @@ async function runSync({manual=false,adopt=false}={}){
     const remoteFp=fingerprint(remote);        // לפני המיזוג: איחוד הכפולים למטה עלול לשנות את remote עצמו
     let next,msg='';
     // המיזוג רץ מול S הנוכחי, כך שעריכות שנעשו בזמן הקריאה מהענן נכללות.
-    if(adopt&&!base) next=remoteEmpty?S:remote;              // מכשיר שמצטרף ל-Bin קיים
+    if(adopt&&!base){                                        // מכשיר שמצטרף למאגר קיים
+      // T-29: לא זורקים בשקט רישומים מקומיים. אם במכשיר יש כבר תנועות שלא עלו לענן, שואלים לפני.
+      if(remoteEmpty||!S.log.length) next=remoteEmpty?S:remote;
+      else if(confirm('במכשיר הזה יש כבר רישומי מלאי שעדיין לא נשמרו בענן.\nלמזג אותם עם הנתונים שכבר בענן?\n\nאישור = מיזוג · ביטול = להשתמש בנתונים שבענן (הרישום המקומי יימחק)'))
+        next=pruneState(mergeStates(S,remote,null));
+      else next=remote;
+    }
     else if(remote.epoch!==S.epoch){
       if(base&&base.epoch===remote.epoch) next=S;            // המכשיר הזה איפס/ייבא ← הנתונים שלו קובעים
       else if(!base&&remoteEmpty) next=S;
