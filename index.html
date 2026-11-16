@@ -344,10 +344,10 @@
   .ob-input{
     width:100%; height:44px; border-radius:12px;
     border:1.5px solid rgba(58,36,20,0.18); background:#fff; color:var(--ob-ink);
-    font-family:'Heebo'; font-size:14.5px; padding:0 14px;
+    font-family:'Heebo'; font-size:16px; padding:0 14px; /* 16px ומעלה: באייפון הדף לא מתקרב בזמן הקלדה */
     transition:border-color .15s ease, box-shadow .15s ease;
   }
-  .ob-input::placeholder{color:rgba(107,86,66,0.55);}
+  .ob-input::placeholder{color:#6b5644;}
   .ob-input:focus{outline:none; border-color:var(--ob-gold-deep); box-shadow:0 0 0 3px rgba(201,151,59,0.22);}
 
   .ob-summary{margin-top:18px; padding-top:16px; border-top:2px dashed var(--ob-gold);}
@@ -374,6 +374,28 @@
   .ob-error:empty{display:none;}
   .ob-input[aria-invalid="true"]{border-color:#b3261e;}
   .ob-send-btn:disabled{background:#cbbfa8; color:#8a7f6c; box-shadow:none; cursor:not-allowed; filter:none; transform:none;}
+
+  /* מסך "ההזמנה התקבלה": מחליף את הטופס אחרי שהשרת שמר את ההזמנה */
+  .order-builder.is-confirmed > :not(#ob-confirm):not(.copy-toast):not(.ob-quick-actions){display:none;} /* ביט/פייבוקס ו-Waze נשארים: בדיוק עכשיו משלמים ומנווטים */
+  .ob-confirm[hidden]{display:none;}
+  .ob-confirm{text-align:center; padding:6px 0;}
+  .ob-confirm:focus{outline:none;}
+  .ob-confirm-title{font-family:'Rubik',sans-serif; font-weight:900; font-size:24px; color:var(--ob-ink);}
+  .ob-confirm-num{font-family:'Rubik',sans-serif; font-weight:900; font-size:30px; color:var(--ob-gold-deep); margin:8px 0 2px; direction:ltr;}
+  .ob-confirm-dup{font-size:13.5px; color:var(--ob-ink-soft); margin-bottom:6px;}
+  .ob-confirm-dup:empty{display:none;}
+  .ob-confirm .ob-lines{text-align:right; margin-top:14px;}
+  .ob-confirm-note{font-size:15px; font-weight:600; color:var(--ob-ink); margin-top:16px; line-height:1.5;}
+  .ob-confirm-actions{display:flex; flex-direction:column; gap:10px; margin-top:18px;}
+  .ob-confirm-actions a.ob-send-btn{margin-top:0; text-decoration:none;}
+  .ob-new-btn{
+    padding:12px 20px; border-radius:999px; font-size:15px; font-weight:700;
+    background:#fff; color:var(--ob-ink); border:1.5px solid rgba(58,36,20,0.18); cursor:pointer;
+  }
+  .ob-new-btn:hover{border-color:var(--ob-gold-deep);}
+  .ob-fallback{font-size:13.5px; text-align:center; margin-top:10px; color:var(--ob-ink-soft);}
+  .ob-fallback[hidden]{display:none;}
+  .ob-fallback a{color:var(--ob-ink); font-weight:700;}
 
   .ob-quick-actions{display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:14px;}
   .quick-btn{
@@ -524,6 +546,7 @@
     --coffee-2:#3A2414;
     --gold:#C8962E;
     --gold-deep:#9E7420;
+    --gold-text:#7A5A12; /* זהב כהה לטקסט בלבד: ניגודיות של כ-5.5:1 על השמנת (הזהב הרגיל נשאר לקישוטים ולמסגרות) */
     --gold-light:#E7C46A;
     --crust:var(--gold);
     --crust-light:var(--gold-light);
@@ -554,14 +577,14 @@
   }
   .brand .flame{background:var(--ink); box-shadow:none;}
   .brand-text .name{font-family:'Rubik',sans-serif; font-weight:900; font-size:19px;}
-  .brand-text .tag{opacity:1; color:var(--gold-deep); font-weight:600;}
+  .brand-text .tag{opacity:1; color:var(--gold-text); font-weight:600;}
   .pill-btn{background:#fff; border:1.5px solid var(--line); color:var(--ink);}
   .pill-btn:hover{border-color:var(--gold);}
 
   /* אזור הפתיחה */
   .hero{background:var(--cream); color:var(--ink); padding:36px 20px 30px;}
   .hero h1{font-size:clamp(34px,10vw,52px); font-weight:900; line-height:1.1; letter-spacing:-0.5px;}
-  .hero h1 span{color:var(--gold);}
+  .hero h1 span{color:var(--gold-text);}
   .hero p{opacity:1; color:#5a4636; font-size:15px;}
   /* "נאפים במקום": שורה מודגשת עם קווים זהובים משני הצדדים */
   .hero p.hero-tagline{
@@ -576,19 +599,19 @@
   .hero-btn.secondary{color:var(--ink); border:1.5px solid var(--ink);}
   .feature-pill{background:#fff; border:1.5px solid var(--line); color:var(--ink);}
   .status-pill.is-open{color:#16753c; background:#eaf7ee; border-color:#bfe5cb;}
-  .status-pill.is-closed{color:var(--gold-deep); background:#fbf3e2; border-color:#ecd6a6;}
+  .status-pill.is-closed{color:var(--gold-text); background:#fbf3e2; border-color:#ecd6a6;}
   .status-pill.is-closed .status-dot{background:var(--gold);}
   .feature-pill.kosher{color:var(--ink); background:#fff; border:1.5px dashed var(--gold);}
 
   /* כותרות אזורים */
-  .menu-head .eyebrow{color:var(--gold-deep);}
+  .menu-head .eyebrow{color:var(--gold-text);}
   /* מעל התמונה אין כותרת גלויה, אז "ישר מהתנור" גדול יותר */
   .gallery .menu-head .eyebrow{font-family:'Rubik',sans-serif; font-weight:800; font-size:19px; letter-spacing:0.5px;}
   .menu-head h2{color:var(--ink); font-family:'Rubik',sans-serif; font-weight:900; font-size:26px;}
   .gallery-grid figure{border-color:#fff; box-shadow:var(--shadow);}
 
   /* טופס ההזמנה - מתאים לגוונים של הפלאייר */
-  .ob-wrap{--ob-ink:#2B1A0F; --ob-ink-soft:#6b5644; --ob-gold:#C8962E; --ob-gold-deep:#9E7420;}
+  .ob-wrap{--ob-ink:#2B1A0F; --ob-ink-soft:#6b5644; --ob-gold:#C8962E; --ob-gold-deep:#7A5A12;}
   .ob-wrap .price-chip{border:1.5px solid var(--gold); background:#fff;}
   .ob-wrap .price-chip b{font-family:'Rubik',sans-serif; font-weight:900; font-size:16px;}
   .order-builder{border:1.5px solid var(--gold); box-shadow:var(--shadow);}
@@ -606,11 +629,11 @@
   .about-head .name{font-family:'Rubik',sans-serif; font-weight:900; font-size:20px;}
   .about p.lead{opacity:1; color:#5a4636;}
   .info-card{background:#fff; border:1.5px solid var(--line);}
-  .info-card h4{color:var(--gold-deep); font-size:13px;}
+  .info-card h4{color:var(--gold-text); font-size:13px;}
   .info-row{border-bottom-color:var(--line);}
   .info-row .l{opacity:1; color:#6b5644;}
   .info-row a{color:var(--ink); font-weight:700;}
-  .legal-link{color:var(--gold-deep);}
+  .legal-link{color:var(--gold-text);}
   .fine-print{color:#6b5644; opacity:1;}
 </style>
 </head>
@@ -787,8 +810,31 @@
     <div id="ob-error" class="ob-error" role="alert"></div>
 
     <button type="button" id="ob-send" class="ob-send-btn" disabled aria-disabled="true">
-      לשלוח את ההזמנה בוואטסאפ
+      שליחת ההזמנה
     </button>
+
+    <!-- כשהשרת לא רשם את ההזמנה: פותחים וואטסאפ לבד, וכאן קישור למקרה שהוא לא נפתח -->
+    <p id="ob-fallback" class="ob-fallback" hidden>
+      לא הצלחנו לרשום את ההזמנה באתר, אז פתחנו וואטסאפ כדי שתשלחו אותה ישירות.
+      <a id="ob-fallback-link" href="#">לא נפתח? לחצו כאן</a> · או התקשרו: <a href="tel:0549073509">054-9073509</a>
+    </p>
+
+    <!-- מסך "ההזמנה התקבלה". הפרטים והסכום מגיעים מהשרת, כפי שההזמנה נשמרה -->
+    <div id="ob-confirm" class="ob-confirm" hidden tabindex="-1" role="status">
+      <div class="ob-confirm-title">✅ ההזמנה התקבלה</div>
+      <div class="ob-confirm-num" id="ob-confirm-num"></div>
+      <div class="ob-confirm-dup" id="ob-confirm-dup"></div>
+      <ul class="ob-lines" id="ob-confirm-lines"></ul>
+      <div class="ob-total-row">
+        <span>סה"כ לתשלום</span>
+        <span id="ob-confirm-total"></span>
+      </div>
+      <p class="ob-confirm-note">ההזמנה תהיה מוכנה תוך כשעה. ניצור איתכם קשר כשהיא מוכנה.</p>
+      <div class="ob-confirm-actions">
+        <a id="ob-confirm-wa" class="ob-send-btn" href="#">שלחו לנו גם בוואטסאפ</a>
+        <button type="button" id="ob-new-order" class="ob-new-btn">הזמנה חדשה</button>
+      </div>
+    </div>
 
     <div class="ob-quick-actions">
       <button type="button" class="quick-btn" data-copy="0549073509" data-label="תשלום">
@@ -1096,13 +1142,42 @@ function scrollToId(id){
     try{ localStorage.removeItem(CART_STORAGE_KEY); } catch(e){}
   }
 
+  /* ===== מזהה המגש (מניעת הזמנה כפולה) =====
+   * לכל מגש נוצר מזהה אקראי בלחיצה הראשונה על "שליחת ההזמנה", והוא נשלח לשרת עם ההזמנה.
+   * לחיצה שנייה, רענון או חזרה מוואטסאפ שולחים את אותו מזהה, והשרת מחזיר את ההזמנה שכבר נשמרה ולא יוצר חדשה.
+   * המזהה מתחלף כשהכמויות משתנות, אחרי שההזמנה נשמרה, או אחרי 30 דקות. */
+  var CART_REF_KEY = 'burekas_amaka_cart_ref';
+  var CART_REF_TTL_MS = 30 * 60 * 1000;
+  var memoryCartRef = null; // כש-localStorage חסום: ההגנה עובדת כל עוד הדף פתוח
+
+  function newRef(){
+    if(window.crypto && crypto.randomUUID){ return crypto.randomUUID(); }
+    var bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    return Array.prototype.map.call(bytes, function(b){ return ('0' + b.toString(16)).slice(-2); }).join('');
+  }
+  function getCartRef(){
+    var entry = memoryCartRef;
+    try{ var raw = localStorage.getItem(CART_REF_KEY); if(raw){ entry = JSON.parse(raw); } } catch(e){}
+    if(entry && entry.ref && Date.now() - entry.at < CART_REF_TTL_MS){ return entry.ref; }
+    entry = { ref: newRef(), at: Date.now() };
+    memoryCartRef = entry;
+    try{ localStorage.setItem(CART_REF_KEY, JSON.stringify(entry)); } catch(e){}
+    return entry.ref;
+  }
+  function clearCartRef(){
+    memoryCartRef = null;
+    try{ localStorage.removeItem(CART_REF_KEY); } catch(e){}
+  }
+
   function showRestoreButtonIfAvailable(){
     try{
       restoreBtn.hidden = !localStorage.getItem(LAST_ORDER_KEY);
     } catch(e){ restoreBtn.hidden = true; }
   }
 
-  function clamp(n){ return Math.max(0, Math.min(30, n)); }
+  var MAX_QTY = 30; // כמות מרבית לכל פריט. חייב להיות זהה ל-MAX_QTY בשרת (worker.js); הבדיקה השבועית משווה
+  function clamp(n){ return Math.max(0, Math.min(MAX_QTY, n)); }
 
   // שחזור העגלה השמורה מביקור קודם - רק על מפתחות שעדיין קיימים בטופס הנוכחי
   try{
@@ -1141,12 +1216,14 @@ function scrollToId(id){
       STATE[key] = clamp(STATE[key] - 1);
       updateStepperDisplay(stepperEl, key);
       saveCart();
+      clearCartRef(); // מגש שהשתנה = הזמנה חדשה
       render();
     });
     plus.addEventListener('click', function(){
       STATE[key] = clamp(STATE[key] + 1);
       updateStepperDisplay(stepperEl, key);
       saveCart();
+      clearCartRef();
       render();
     });
   });
@@ -1220,8 +1297,12 @@ function scrollToId(id){
     try{ if(window.turnstile){ window.turnstile.reset(); } } catch(e){}
   }
 
-  // שמירת ההזמנה בשרת (לוח הניהול + מייל). השרת מחשב את המחיר בעצמו - שולחים רק כמויות.
-  // מחזיר { orderNum } בהצלחה, { error } אם השרת דחה את ההזמנה, או null אם לא הייתה תשובה.
+  // שמירת ההזמנה בשרת (לוח הניהול, טלגרם ומייל). השרת מחשב את המחיר בעצמו - שולחים רק כמויות.
+  // מחזיר אחד מאלה:
+  //   { saved: true, receipt }  - נשמרה. receipt = מה שהשרת החזיר: מספר, פירוט וסכום
+  //   { error }                 - השרת דחה (400, למשל טלפון לא תקין): עוצרים ומציגים את הסיבה
+  //   { notSaved: true }        - השרת ענה שלא שמר (403, 413, 429, 500)
+  //   { noAnswer: true }        - אין תשובה (8 שניות או תקלת רשת). ייתכן שההזמנה נשמרה בכל זאת
   async function saveOrderToServer(customerName, customerPhone, customerNotes){
     var items = {};
     Object.keys(STATE).forEach(function(key){
@@ -1233,19 +1314,98 @@ function scrollToId(id){
       var res = await fetch(API_URL + '/api/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: items, name: customerName, phone: customerPhone, notes: customerNotes, turnstileToken: getTurnstileToken() }),
+        body: JSON.stringify({ items: items, name: customerName, phone: customerPhone, notes: customerNotes, turnstileToken: getTurnstileToken(), clientRef: getCartRef() }),
         signal: controller.signal
       });
       var data = await res.json().catch(function(){ return {}; });
-      if(res.ok){ return { orderNum: data.orderNum || null }; }
+      if(res.ok && data.orderNum){ return { saved: true, receipt: data }; }
       if(res.status === 400){ return { error: data.error || 'לא הצלחנו לקבל את ההזמנה' }; }
-      // 429 (הגבלת קצב) ושגיאות שרת: לא חוסמים את הלקוח - ממשיכים לוואטסאפ בלי מספר הזמנה
-      return null;
+      return { notSaved: true };
     } catch(e){
-      return null;
+      return { noAnswer: true };
     } finally {
       clearTimeout(timer);
     }
+  }
+
+  // הודעת הוואטסאפ. lines/comboCount/total מגיעים מהשרת כשההזמנה נשמרה, ומהחישוב בדפדפן כשלא.
+  // warning = שורה לצוות כשההזמנה לא נרשמה (או לא ברור אם נרשמה)
+  function buildWhatsappUrl(o){
+    var msgLines = ['היי בורקס עמקה! 😊'];
+    if(o.warning){ msgLines.push(o.warning); }
+    if(o.orderNum){ msgLines.push('מספר הזמנה: ' + o.orderNum); }
+    if(o.name){ msgLines.push('שם המזמין: ' + o.name); }
+    msgLines.push('טלפון: ' + o.phone);
+    msgLines.push('אשמח להזמין מגש חם עם:');
+    o.lines.forEach(function(line){ msgLines.push('• ' + line.qty + ' × ' + line.label); });
+    if(o.comboCount > 0){ msgLines.push('• כולל מבצע בורקס+ביצה+טרופית × ' + o.comboCount); }
+    if(o.notes){ msgLines.push('הערות: ' + o.notes); }
+    msgLines.push('');
+    msgLines.push('סה"כ לתשלום: ' + o.total + ' ₪');
+    msgLines.push('תודה רבה ומחכה/ה בשמחה! 🙏');
+    return 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msgLines.join('\n'));
+  }
+
+  /* ===== מסך "ההזמנה התקבלה" =====
+   * נשמר ב-sessionStorage, כדי שלקוח שעבר לוואטסאפ וחזר יראה שוב את האישור ולא טופס ריק (עד 30 דקות) */
+  var CONFIRM_KEY = 'burekas_amaka_confirm';
+  var formEl = document.getElementById('order-form');
+  var confirmEl = document.getElementById('ob-confirm');
+  var fallbackEl = document.getElementById('ob-fallback');
+
+  function showConfirmation(c){
+    document.getElementById('ob-confirm-num').textContent = '#' + c.orderNum;
+    document.getElementById('ob-confirm-dup').textContent = c.duplicate && c.createdAt
+      ? 'ההזמנה הזו כבר התקבלה בשעה ' + new Date(c.createdAt).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })
+      : '';
+    var listEl = document.getElementById('ob-confirm-lines');
+    listEl.innerHTML = '';
+    c.lines.forEach(function(line){
+      var li = document.createElement('li');
+      var left = document.createElement('span');
+      var qty = document.createElement('b');
+      qty.textContent = line.qty + '×';
+      left.appendChild(qty);
+      left.appendChild(document.createTextNode(' ' + line.label));
+      var right = document.createElement('span');
+      right.textContent = (line.qty * line.price) + ' ₪';
+      li.appendChild(left);
+      li.appendChild(right);
+      listEl.appendChild(li);
+    });
+    if(c.comboCount > 0){
+      var comboLi = document.createElement('li');
+      comboLi.innerHTML = '<span></span><span></span>';
+      comboLi.firstChild.textContent = 'מבצע (בורקס+ביצה+טרופית) × ' + c.comboCount;
+      comboLi.lastChild.textContent = '-' + c.discount + ' ₪';
+      listEl.appendChild(comboLi);
+    }
+    document.getElementById('ob-confirm-total').textContent = c.total + ' ₪';
+    document.getElementById('ob-confirm-wa').href = c.waUrl;
+    fallbackEl.hidden = true;
+    confirmEl.hidden = false;
+    formEl.classList.add('is-confirmed');
+    try{ confirmEl.focus({ preventScroll: true }); } catch(e){}
+    try{ formEl.scrollIntoView({ block: 'start' }); } catch(e){}
+  }
+
+  function hideConfirmation(){
+    confirmEl.hidden = true;
+    formEl.classList.remove('is-confirmed');
+    try{ sessionStorage.removeItem(CONFIRM_KEY); } catch(e){}
+  }
+
+  // מאפס את המגש (כפתור "איפוס", ואחרי הזמנה שנשמרה). השם והטלפון נשארים שמורים
+  function resetCart(){
+    Object.keys(STATE).forEach(function(key){ STATE[key] = 0; });
+    steppers.forEach(function(stepperEl){
+      stepperEl.querySelector('.step-val').textContent = '0';
+      stepperEl.querySelector('.minus').disabled = true;
+    });
+    notesInput.value = '';
+    clearSavedCart();
+    clearCartRef();
+    render();
   }
 
   sendBtn.addEventListener('click', async function(){
@@ -1268,53 +1428,68 @@ function scrollToId(id){
       localStorage.setItem(PHONE_STORAGE_KEY, customerPhone);
     } catch(e){}
 
+    // בלי אינטרנט גם וואטסאפ לא ייפתח: אומרים את זה מיד
+    if(navigator.onLine === false){
+      showError('אין חיבור לאינטרנט. אפשר להתקשר אלינו: 054-9073509');
+      return;
+    }
+
     sendBtn.disabled = true;
     sendBtn.textContent = 'שולחים את ההזמנה...';
     var saved = await saveOrderToServer(customerName, customerPhone, customerNotes);
     resetTurnstile(); // כל טוקן תקף לשימוש אחד בלבד
 
     // השרת דחה את ההזמנה (למשל טלפון לא תקין או הזמנה ריקה) - עוצרים ומציגים את הסיבה
-    if(saved && saved.error){
+    if(saved.error){
       showError(saved.error);
       sendBtn.textContent = sendBtnText;
       sendBtn.disabled = false;
       return;
     }
-    // אם השרת לא ענה בכלל, ממשיכים לוואטסאפ בכל זאת - כדי שההזמנה לא תלך לאיבוד
-    var orderNum = saved ? saved.orderNum : null;
 
-    var msgLines = ['היי בורקס עמקה! 😊'];
-    if(orderNum){ msgLines.push('מספר הזמנה: ' + orderNum); }
-    if(customerName){ msgLines.push('שם המזמין: ' + customerName); }
-    msgLines.push('טלפון: ' + customerPhone);
-    msgLines.push('אשמח להזמין מגש חם עם:');
-    result.lines.forEach(function(line){
-      msgLines.push('• ' + line.qty + ' × ' + line.label);
-    });
-    if(result.comboCount > 0){
-      msgLines.push('• כולל מבצע בורקס+ביצה+טרופית × ' + result.comboCount);
-    }
-    if(customerNotes){
-      msgLines.push('הערות: ' + customerNotes);
-    }
-    msgLines.push('');
-    msgLines.push('סה"כ לתשלום: ' + result.total + ' ₪');
-    msgLines.push('תודה רבה ומחכה/ה בשמחה! 🙏');
-
-    var url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msgLines.join('\n'));
-
-    // שומרים את ההזמנה הזו כ"הזמנה אחרונה" לשחזור עתידי, ומנקים את עגלת העבודה הנוכחית
-    // ההערות נשמרות יחד עם הכמויות, כדי שגם הן יחזרו בשחזור
+    // "הזמנה אחרונה" לשחזור עתידי: הכמויות וההערות, כפי שהלקוח בחר
     var lastOrderToSave = { notes: customerNotes };
     Object.keys(STATE).forEach(function(key){ lastOrderToSave[key] = STATE[key]; });
     try{ localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(lastOrderToSave)); } catch(e){}
-    clearSavedCart();
+
+    var url;
+    if(saved.saved){
+      // ההזמנה נשמרה: מציגים את מה שהשרת שמר (מספר, פירוט וסכום), ולא את החישוב בדפדפן
+      var r = saved.receipt;
+      var lines = (r.items || []).map(function(it){ return { label: it.name, qty: it.qty, price: it.price }; });
+      if(typeof r.total === 'number' && r.total !== result.total){
+        console.warn('הסכום בשרת שונה מהסכום באתר:', r.total, result.total);
+      }
+      url = buildWhatsappUrl({ orderNum: r.orderNum, name: customerName, phone: customerPhone, notes: customerNotes,
+        lines: lines, comboCount: r.comboCount || 0, total: r.total });
+      var confirmation = { orderNum: r.orderNum, lines: lines, comboCount: r.comboCount || 0, discount: r.discount || 0,
+        total: r.total, duplicate: !!r.duplicate, createdAt: r.createdAt, waUrl: url, at: Date.now() };
+      try{ sessionStorage.setItem(CONFIRM_KEY, JSON.stringify(confirmation)); } catch(e){}
+      resetCart(); // המגש התרוקן והמזהה נמחק: לחיצה הבאה היא הזמנה חדשה
+      showConfirmation(confirmation);
+    } else {
+      // השרת לא רשם (או שלא ברור אם רשם): ממשיכים לוואטסאפ כמו תמיד, עם שורה לצוות.
+      // המגש והמזהה נשארים, כדי שלחיצה נוספת תהיה ניסיון חוזר מוגן ולא הזמנה חדשה
+      var warning = saved.noAnswer
+        ? '⚠️ לא התקבל אישור מהאתר. ייתכן שההזמנה כבר נרשמה: נא לבדוק לפי הטלפון לפני שמזינים אותה.'
+        : '⚠️ ההזמנה לא נרשמה במערכת של האתר. נא להזין אותה ידנית.';
+      url = buildWhatsappUrl({ warning: warning, name: customerName, phone: customerPhone, notes: customerNotes,
+        lines: result.lines, comboCount: result.comboCount, total: result.total });
+      document.getElementById('ob-fallback-link').href = url;
+      fallbackEl.hidden = false;
+    }
 
     sendBtn.textContent = sendBtnText;
-    sendBtn.disabled = false;
+    render(); // מחזיר את מצב הכפתור (כבוי כשהמגש ריק)
 
+    // וואטסאפ נפתח לבד אחרי השליחה, כמו תמיד (החלטה של אלירן, 16.11.2026).
     // location.href במקום window.open כדי להימנע מחסימת פופ-אפים בדפדפני מובייל
     window.location.href = url;
+  });
+
+  document.getElementById('ob-new-order').addEventListener('click', function(){
+    hideConfirmation();
+    try{ nameInput.focus(); } catch(e){}
   });
 
   // שעת איסוף מהזמנה קודמת לא רלוונטית להזמנה חדשה: מורידים מההערות כל חלק שמדבר על שעה.
@@ -1343,23 +1518,28 @@ function scrollToId(id){
         updateStepperDisplay(stepperEl, stepperEl.getAttribute('data-item'));
       });
       saveCart();
+      clearCartRef();
       render();
     } catch(e){ /* נתונים שמורים לא תקינים - מתעלמים */ }
   });
 
   resetBtn.addEventListener('click', function(){
-    Object.keys(STATE).forEach(function(key){ STATE[key] = 0; });
-    steppers.forEach(function(stepperEl){
-      stepperEl.querySelector('.step-val').textContent = '0';
-      stepperEl.querySelector('.minus').disabled = true;
-    });
-    notesInput.value = '';
-    clearSavedCart();
-    render();
+    resetCart();
+    fallbackEl.hidden = true;
   });
 
   showRestoreButtonIfAvailable();
   render();
+
+  // לקוח שחזר מוואטסאפ (או רענן) בתוך 30 דקות: רואה שוב את מסך האישור
+  try{
+    var savedConfirm = JSON.parse(sessionStorage.getItem(CONFIRM_KEY) || 'null');
+    if(savedConfirm && savedConfirm.orderNum && Date.now() - savedConfirm.at < CART_REF_TTL_MS){
+      showConfirmation(savedConfirm);
+    } else if(savedConfirm){
+      sessionStorage.removeItem(CONFIRM_KEY);
+    }
+  } catch(e){}
 })();
 
 (function(){
