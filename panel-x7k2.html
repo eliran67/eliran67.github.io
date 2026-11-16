@@ -174,9 +174,12 @@
     <div class="flame">🔥</div>
     <h1>לוח בקרה — בורקס עמקה</h1>
     <p>הזן את סיסמת הניהול כדי לצפות בהזמנות</p>
-    <input type="password" id="pwInput" placeholder="••••••" autocomplete="off">
-    <button onclick="login()">כניסה</button>
-    <div class="login-error" id="loginError"></div>
+    <form onsubmit="login(); return false;">
+      <input type="text" name="username" value="burekas-admin" autocomplete="username" hidden>
+      <input type="password" id="pwInput" placeholder="סיסמת ניהול" aria-label="סיסמת ניהול" autocomplete="current-password">
+      <button type="submit" id="loginBtn">כניסה</button>
+    </form>
+    <div class="login-error" id="loginError" role="alert"></div>
   </div>
 </div>
 
@@ -189,6 +192,7 @@
     </div>
   </header>
   <main>
+    <div class="email-alert" id="connAlert" role="alert"></div>
     <div class="email-alert" id="tgAlert" role="alert"></div>
     <div class="email-alert" id="emailAlert" role="alert"></div>
     <div class="backup-alert" id="backupAlert" role="status"></div>
@@ -201,7 +205,7 @@
       <div class="col-orders">
         <div class="toolbar" id="toolbar"></div>
         <div id="ordersList"></div>
-        <div class="refresh-note">מתעדכן אוטומטית כל 30 שניות · <a href="#" onclick="loadOrders(); return false;" style="color:var(--terracotta); font-weight:700;">רענן עכשיו</a></div>
+        <div class="refresh-note"><span id="refreshWhen">מתעדכן אוטומטית כל 30 שניות</span> · <a href="#" onclick="loadOrders(); return false;" style="color:var(--terracotta); font-weight:700;">רענן עכשיו</a></div>
       </div>
       <div class="col-stats">
         <section class="stats-card" id="statsCard" hidden></section>
@@ -225,7 +229,6 @@
 </div>
 
 <script>
-// ===== עדכן כאן לכתובת ה-Worker שלך אחרי הפריסה ל-Cloudflare =====
 const API_URL = 'https://api.burekas-amka.co.il';
 
 let STATUSES = ['חדשה','בטיפול','מוכנה','הושלמה','בוטלה']; // מתעדכן מהשרת
@@ -263,25 +266,38 @@ async function login(){
   errEl.textContent = '';
   if(!pw){ errEl.textContent = 'הזן סיסמה'; return; }
 
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
   try{
     const res = await fetch(API_URL + '/api/admin/login', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ password: pw })
     });
-    const data = await res.json();
-    if(!res.ok){ errEl.textContent = data.error || 'שגיאה בהתחברות'; return; }
+    const data = await res.json().catch(() => ({}));
+    if(!res.ok || !data.token){ errEl.textContent = data.error || 'שגיאה בהתחברות'; return; }
     setToken(data.token);
+    document.getElementById('pwInput').value = '';
     showDashboard();
   } catch(e){
-    errEl.textContent = 'שגיאת רשת — בדוק שכתובת ה-API הוגדרה נכון';
+    errEl.textContent = 'אין חיבור לשרת. בדקו את האינטרנט ונסו שוב.';
+  } finally {
+    btn.disabled = false;
   }
 }
 
-function logout(){
+// יציאה (בלחיצה, או כשהחיבור פג). מנקה גם את ההזמנות מהדף, כדי שפרטי לקוחות לא יישארו על מחשב משותף
+function logout(reason){
   clearToken();
   if(pollTimer) clearInterval(pollTimer);
+  pollTimer = null;
+  allOrders = []; knownOrderIds = null; lastLoadedAt = null; lastRenderedJson = '';
+  document.getElementById('ordersList').innerHTML = '';
+  document.getElementById('connAlert').textContent = '';
+  document.getElementById('tgAlert').innerHTML = '';
+  document.title = 'לוח בקרה — בורקס עמקה';
   document.getElementById('dashboard').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginError').textContent = typeof reason === 'string' ? reason : '';
 }
 
 function showDashboard(){
@@ -316,32 +332,78 @@ function setFilter(f){
   renderOrders();
 }
 
+// מתי הרשימה נטענה בהצלחה לאחרונה, ומה צויר (כדי לא לצייר מחדש כשכלום לא השתנה)
+let lastLoadedAt = null;
+let lastRenderedJson = '';
+let statusBusy = false; // בזמן שינוי סטטוס לא מציירים מחדש, כדי שהתיבה לא תקפוץ
+
+function timeHM(d){ return d.toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'}); }
+
+// הפס בתחתית: "עודכן ב-HH:MM", או פס אדום כשאין חיבור (הרשימה שעל המסך נשארת, עם השעה שלה)
+function setConnection(ok, detail){
+  const el = document.getElementById('connAlert');
+  const note = document.getElementById('refreshWhen');
+  if(ok){
+    el.textContent = '';
+    note.textContent = 'עודכן ב-' + timeHM(lastLoadedAt);
+  } else {
+    el.textContent = '⚠️ אין חיבור לשרת' + (detail ? ` (${detail})` : '') + '. '
+      + (lastLoadedAt ? `ההזמנות שעל המסך הן מ-${timeHM(lastLoadedAt)}.` : 'עוד לא נטענו הזמנות.')
+      + ' ננסה שוב בעוד 30 שניות.';
+  }
+}
+
 async function loadOrders(){
   const token = getToken();
   if(!token){ logout(); return; }
 
+  let res, data;
   try{
-    const res = await fetch(API_URL + '/api/admin/orders', {
+    res = await fetch(API_URL + '/api/admin/orders', {
       headers: { 'Authorization': 'Bearer ' + token }
     });
-    if(res.status === 401){ logout(); return; }
-    const data = await res.json();
-    allOrders = data.orders || [];
-    if(data.statuses){ STATUSES = data.statuses; renderToolbar(); }
-
-    const ids = new Set(allOrders.map(o => o.id));
-    if(knownOrderIds && allOrders.some(o => !knownOrderIds.has(o.id))){ beep(); }
-    knownOrderIds = ids;
-    const newCount = allOrders.filter(o => o.status === 'חדשה').length;
-    document.title = (newCount ? `(${newCount}) ` : '') + 'לוח בקרה — בורקס עמקה';
-
-    renderEmailAlert(data.lastEmail);
-    renderOrders();
-    renderTelegramAlert();
+    if(res.status === 401){ logout('החיבור פג. היכנסו שוב.'); return; }
+    data = await res.json().catch(() => null);
   } catch(e){
-    // שקט - ננסה שוב בפעם הבאה
+    setConnection(false, 'אין רשת');
+    return;
   }
+  // תשובה לא תקינה: לא מוחקים את הרשימה ולא מציגים "אין הזמנות", אלא אומרים שיש תקלה
+  if(!res.ok || !data || !Array.isArray(data.orders)){
+    setConnection(false, 'השרת החזיר ' + res.status);
+    return;
+  }
+
+  allOrders = data.orders;
+  lastLoadedAt = new Date();
+  setConnection(true);
+  if(data.statuses){ STATUSES = data.statuses; renderToolbar(); }
+
+  const ids = new Set(allOrders.map(o => o.id));
+  if(knownOrderIds && allOrders.some(o => !knownOrderIds.has(o.id))){ beep(); }
+  knownOrderIds = ids;
+  const newCount = allOrders.filter(o => o.status === 'חדשה').length;
+  document.title = (newCount ? `(${newCount}) ` : '') + 'לוח בקרה — בורקס עמקה';
+
+  renderEmailAlert(data.lastEmail);
+  renderTelegramAlert();
+  // לא מציירים מחדש אם כלום לא השתנה. אם מישהו באמצע בחירה בתיבת סטטוס, מחכים שיצא ממנה (pendingRender),
+  // אבל הזמנה חדשה מצוירת תמיד, כדי שהרשימה לא "תקפא" כשתיבה נשארת בפוקוס
+  const json = JSON.stringify(allOrders);
+  if(json === lastRenderedJson) return;
+  const selecting = document.activeElement && document.activeElement.classList.contains('status-select');
+  const hasNewOrder = !renderedIds || allOrders.some(o => !renderedIds.has(o.id));
+  if((selecting || statusBusy) && !hasNewOrder){ pendingRender = true; return; }
+  renderOrders();
 }
+let renderedIds = null;
+let pendingRender = false;
+// יציאה מתיבת סטטוס: אם בינתיים הגיע עדכון, מציירים עכשיו
+document.addEventListener('focusout', (e) => {
+  if(pendingRender && !statusBusy && e.target.classList && e.target.classList.contains('status-select')){
+    setTimeout(() => { if(pendingRender && !statusBusy) renderOrders(); }, 0);
+  }
+});
 
 function renderEmailAlert(lastEmail){
   const el = document.getElementById('emailAlert');
@@ -364,6 +426,9 @@ function renderTelegramAlert(){
 
 function renderOrders(){
   const list = document.getElementById('ordersList');
+  lastRenderedJson = JSON.stringify(allOrders);
+  renderedIds = new Set(allOrders.map(o => o.id));
+  pendingRender = false;
   const filtered = currentFilter === 'הכל' ? allOrders : allOrders.filter(o => o.status === currentFilter);
 
   if(filtered.length === 0){
@@ -402,7 +467,7 @@ function renderOrders(){
           : '🔒 פרטי הלקוח נמחקו (הזמנה מלפני יותר משנה)'}
       </div>
       <div class="order-total">סה״כ: ${o.total} ₪</div>
-      <select class="status-select" onchange="updateStatus('${o.id}', this.value)">
+      <select class="status-select" aria-label="סטטוס הזמנה #${esc(o.orderNum)}" data-id="${esc(o.id)}" data-from="${esc(o.status)}" onchange="updateStatus(this)">
         ${STATUSES.map(s => `<option value="${s}" ${s===o.status?'selected':''}>${s}</option>`).join('')}
       </select>
       <button type="button" class="delete-btn" onclick="openDelete('${esc(o.id)}', '${esc(o.orderNum)}')">🗑 מחיקת הזמנה</button>
@@ -434,21 +499,34 @@ function showNote(msg){
   clearTimeout(el._t); el._t = setTimeout(() => { el.style.display = 'none'; }, 3500);
 }
 
-async function updateStatus(id, status){
+// שינוי סטטוס מהתיבה. שולחים גם את הסטטוס שהפאנל הציג (from): אם בינתיים מישהו שינה בטלגרם, השרת לא דורס
+// ומחזיר 409. בכל כישלון: הודעה ברורה, והתיבה חוזרת למצב האמיתי
+async function updateStatus(sel){
+  const id = sel.dataset.id, from = sel.dataset.from, status = sel.value;
   const token = getToken();
+  statusBusy = true;
+  sel.disabled = true;
   try{
-    const res = await fetch(API_URL + '/api/admin/orders/' + id, {
+    const res = await fetch(API_URL + '/api/admin/orders/' + encodeURIComponent(id), {
       method:'PATCH',
       headers:{'Content-Type':'application/json', 'Authorization':'Bearer ' + token},
-      body: JSON.stringify({ status })
+      body: JSON.stringify({ status, from })
     });
     const data = await res.json().catch(() => ({}));
-    showStockNote(data.stock);
-    loadOrders();
-    loadStats();
+    if(res.status === 401){ statusBusy = false; logout('החיבור פג. היכנסו שוב.'); return; }
+    if(!res.ok){
+      showNote('⚠️ ' + (data.error || 'עדכון הסטטוס נכשל, נסו שוב'));
+    } else {
+      showStockNote(data.stock);
+    }
   } catch(e){
-    alert('עדכון הסטטוס נכשל, נסה שוב');
+    showNote('⚠️ אין חיבור לשרת. הסטטוס לא השתנה, נסו שוב');
   }
+  statusBusy = false;
+  lastRenderedJson = ''; // מציירים מחדש בכל מקרה, כדי שהתיבה תראה את המצב האמיתי
+  await loadOrders();
+  if(lastRenderedJson === ''){ renderOrders(); } // אם הטעינה נכשלה: לפחות להחזיר את התיבה למה שהיה
+  loadStats();
 }
 
 /* ===== מחיקת הזמנה: רק עם סיסמת הניהול, ובלי לגעת במלאי ===== */
@@ -482,7 +560,7 @@ async function confirmDelete(){
       body: JSON.stringify({ password: pw })
     });
     const data = await res.json().catch(() => ({}));
-    if(res.status === 401){ closeDelete(); logout(); return; }
+    if(res.status === 401){ closeDelete(); logout('החיבור פג. היכנסו שוב.'); return; }
     if(res.status === 404){ closeDelete(); showNote('ההזמנה כבר נמחקה'); loadOrders(); loadStats(); return; }
     if(!res.ok){ errEl.textContent = data.error || 'המחיקה נכשלה, נסה שוב'; btn.disabled = false; return; }
     closeDelete();
@@ -630,7 +708,7 @@ async function downloadBackup(btn){
   btn.disabled = true;
   try{
     const res = await fetch(API_URL + '/api/admin/backup', { headers: { 'Authorization': 'Bearer ' + getToken() } });
-    if(res.status === 401){ logout(); return; }
+    if(res.status === 401){ logout('החיבור פג. היכנסו שוב.'); return; }
     if(!res.ok) throw new Error();
     const blob = await res.blob();
     const a = document.createElement('a');
